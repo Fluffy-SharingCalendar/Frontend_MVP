@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
 
-class EventMarker extends StatefulWidget {
-  const EventMarker({
+class EventDetailMarker extends StatefulWidget {
+  const EventDetailMarker({
     super.key,
     required this.event,
   });
@@ -10,16 +10,15 @@ class EventMarker extends StatefulWidget {
   final Event event;
 
   @override
-  _EventMarkerState createState() => _EventMarkerState();
+  _EventDetailMarkerState createState() => _EventDetailMarkerState();
 }
 
-class _EventMarkerState extends State<EventMarker> {
+class _EventDetailMarkerState extends State<EventDetailMarker> {
   Color eventMarkerColor = const Color.fromARGB(255, 131, 117, 255);
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10.0),
-      padding: const EdgeInsets.all(3.0),
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: eventMarkerColor.withOpacity(0.3),
         borderRadius: BorderRadius.circular(5.0),
@@ -30,19 +29,16 @@ class _EventMarkerState extends State<EventMarker> {
           Icon(
             Icons.event,
             color: eventMarkerColor,
-            size: 13.0,
+            size: 18.0,
           ),
           const SizedBox(width: 5.0),
-          Expanded(
-            child: Text(
-              widget.event.title,
-              style: const TextStyle(
-                fontSize: 10.0,
-                color: Colors.black87,
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
+          Text(
+            widget.event.title,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
             ),
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

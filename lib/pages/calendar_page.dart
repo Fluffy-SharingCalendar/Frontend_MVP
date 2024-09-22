@@ -1,7 +1,9 @@
-import 'package:fluffy_mvp/widgets/event_marker.dart';
+import 'package:fluffy_mvp/widgets/event_detail_modal.dart';
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+
 import 'package:fluffy_mvp/models/event_model.dart';
+
+import 'package:fluffy_mvp/widgets/calendar.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({
@@ -13,96 +15,61 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
-  final CalendarFormat _calendarFormat = CalendarFormat.month;
+  bool _isDetailOpend = false;
+  List<Event> _selectedEvents = [];
+  DateTime? _selectedDay;
 
   final Map<DateTime, List<Event>> _events = {
     DateTime.utc(2024, 9, 10): [const Event('플러터 공부하기')],
     DateTime.utc(2024, 9, 12): [const Event('후추랑 놀기')],
   };
 
-  List<Event> _getEventsForDay(DateTime day) {
-    return _events[day] ?? [];
+  void toggleDetail(bool isOpend) {
+    setState(() {
+      _isDetailOpend = isOpend;
+    });
+  }
+
+  void selectDate(DateTime selectedDay) {
+    _selectedEvents = _events[selectedDay] ?? [];
+    _selectedDay = selectedDay;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("FLUFFY_CALENDAR"),
+        title: const Text("FLUFFY"),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 15.0,
-            vertical: 15.0,
+      body: Stack(
+        children: [
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            left: 0,
+            right:
+                _isDetailOpend ? MediaQuery.of(context).size.width * 0.25 : 0,
+            child: Calendar(
+              events: _events,
+              onDaySelected: (DateTime selectedDay) {
+                toggleDetail(true);
+                selectDate(selectedDay);
+              },
+            ),
           ),
-          child: TableCalendar<Event>(
-            focusedDay: DateTime.now(),
-            firstDay: DateTime.utc(2024, 9, 1),
-            lastDay: DateTime.utc(2024, 12, 31),
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-            },
-            calendarFormat: _calendarFormat,
-            availableCalendarFormats: const {
-              CalendarFormat.month: 'Month',
-            },
-            eventLoader: _getEventsForDay,
-            rowHeight: 100.0,
-            calendarBuilders: CalendarBuilders(
-                selectedBuilder: (context, date, events) => Center(
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFd8d7e4),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            date.day.toString(),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                todayBuilder: (context, date, events) => Center(
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFadb9ca),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            date.day.toString(),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                markerBuilder: (context, date, events) {
-                  if (events.isEmpty) return const SizedBox();
-
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: events.map((event) {
-                      return EventMarker(event: event);
-                    }).toList(),
-                  );
-                }),
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            left: _isDetailOpend
+                ? MediaQuery.of(context).size.width * 0.75
+                : MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width * 0.75,
+            child: EventDetailModal(
+              selectedDay: _selectedDay ?? DateTime.now(),
+              events: _selectedEvents,
+              onClose: () => toggleDetail(false),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
