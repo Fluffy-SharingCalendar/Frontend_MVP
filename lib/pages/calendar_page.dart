@@ -32,24 +32,65 @@ class _CalendarPageState extends State<CalendarPage> {
         title: const Text("FLUFFY_CALENDAR"),
       ),
       body: Center(
-        child: TableCalendar<Event>(
-          focusedDay: DateTime.now(),
-          firstDay: DateTime.utc(2024, 1, 1),
-          lastDay: DateTime.utc(2024, 12, 31),
-          selectedDayPredicate: (day) {
-            return isSameDay(_selectedDay, day);
-          },
-          onDaySelected: (selectedDay, focusedDay) {
-            setState(() {
-              _selectedDay = selectedDay;
-              _focusedDay = focusedDay;
-            });
-          },
-          calendarFormat: _calendarFormat,
-          availableCalendarFormats: const {
-            CalendarFormat.month: 'Month',
-          },
-          eventLoader: _getEventsForDay,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15.0,
+            vertical: 15.0,
+          ),
+          child: TableCalendar<Event>(
+            focusedDay: DateTime.now(),
+            firstDay: DateTime.utc(2024, 9, 1),
+            lastDay: DateTime.utc(2024, 12, 31),
+            selectedDayPredicate: (day) {
+              return isSameDay(_selectedDay, day);
+            },
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            },
+            calendarFormat: _calendarFormat,
+            availableCalendarFormats: const {
+              CalendarFormat.month: 'Month',
+            },
+            eventLoader: _getEventsForDay,
+            rowHeight: 100.0,
+            calendarBuilders: CalendarBuilders(
+              selectedBuilder: (context, date, events) => Center(
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFd8d7e4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      date.day.toString(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+              todayBuilder: (context, date, events) => Center(
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFadb9ca),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      date.day.toString(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
