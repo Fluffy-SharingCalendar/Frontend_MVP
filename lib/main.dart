@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/pages/start_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/pages/calendar_page.dart';
 
@@ -13,9 +14,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fluffy MVP',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/start',
       routes: {
-        '/': (context) => const CalendarPage(),
+        '/calendar': (context) => const CalendarPage(),
+        '/start': (context) => const StartPage(),
       },
     );
   }
