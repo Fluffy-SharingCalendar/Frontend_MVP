@@ -20,8 +20,20 @@ class _CalendarPageState extends State<CalendarPage> {
   DateTime? _selectedDay;
 
   final Map<DateTime, List<Event>> _events = {
-    DateTime.utc(2024, 9, 10): [const Event('플러터 공부하기')],
-    DateTime.utc(2024, 9, 12): [const Event('후추랑 놀기')],
+    DateTime.utc(2024, 9, 10): [
+      Event(
+        '플러터 공부하기',
+        DateTime.utc(2024, 9, 10),
+        DateTime.utc(2024, 9, 10),
+      ),
+    ],
+    DateTime.utc(2024, 9, 12): [
+      Event(
+        '후추랑 놀기',
+        DateTime.utc(2024, 9, 12),
+        DateTime.utc(2024, 9, 12),
+      ),
+    ],
   };
 
   void toggleDetail(bool isOpend) {
@@ -62,7 +74,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 ? MediaQuery.of(context).size.width * 0.75
                 : MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width * 0.75,
+            width: MediaQuery.of(context).size.width * 0.25,
             child: EventDetailModal(
               selectedDay: _selectedDay ?? DateTime.now(),
               events: _selectedEvents,

@@ -14,7 +14,7 @@ class EventList extends StatefulWidget {
   final DateTime selectedDay;
   final List<Event> events;
   final VoidCallback onClose;
-  final VoidCallback onTapDetail;
+  final Function(Event) onTapDetail;
 
   @override
   _EventListState createState() => _EventListState();
@@ -60,7 +60,7 @@ class _EventListState extends State<EventList> {
                   itemBuilder: ((context, index) {
                     final event = widget.events[index];
                     return InkWell(
-                      onTap: widget.onTapDetail,
+                      onTap: () => widget.onTapDetail(event),
                       child: EventDetailMarker(event: event),
                     );
                   }),

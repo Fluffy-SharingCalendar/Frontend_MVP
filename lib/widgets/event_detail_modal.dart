@@ -24,10 +24,12 @@ class EventDetailModal extends StatefulWidget {
 class _EventDetailModalState extends State<EventDetailModal> {
   Color eventMarkerColor = const Color.fromARGB(255, 131, 117, 255);
   bool isClickedDetail = false;
+  Event? selectedEvent;
 
-  void toggleClicked(bool isClicked) {
+  void toggleClicked(bool isClicked, Event? event) {
     setState(() {
       isClickedDetail = isClicked;
+      selectedEvent = event;
     });
   }
 
@@ -41,14 +43,14 @@ class _EventDetailModalState extends State<EventDetailModal> {
         child: isClickedDetail
             ? EventDetail(
                 selectedDay: widget.selectedDay,
-                events: widget.events,
-                onBack: () => toggleClicked(false),
+                event: selectedEvent!,
+                onBack: () => toggleClicked(false, null),
               )
             : EventList(
                 selectedDay: widget.selectedDay,
                 events: widget.events,
                 onClose: widget.onClose,
-                onTapDetail: () => toggleClicked(true),
+                onTapDetail: (event) => toggleClicked(true, event),
               ),
       ),
     );
