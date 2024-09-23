@@ -1,17 +1,16 @@
 import 'package:fluffy_mvp/pages/calendar_page.dart';
-import 'package:fluffy_mvp/pages/phone_num_page.dart';
 import 'package:flutter/material.dart';
 
-class StartPage extends StatefulWidget {
-  const StartPage({
+class PhoneNumPage extends StatefulWidget {
+  const PhoneNumPage({
     super.key,
   });
 
   @override
-  State<StartPage> createState() => _StartPageState();
+  State<PhoneNumPage> createState() => _PhoneNumPageState();
 }
 
-class _StartPageState extends State<StartPage> {
+class _PhoneNumPageState extends State<PhoneNumPage> {
   TextEditingController textEditingController = TextEditingController();
   bool isValid = false;
 
@@ -38,9 +37,9 @@ class _StartPageState extends State<StartPage> {
             const SizedBox(
               height: 10.0,
             ),
-            const Text("추억을 공유하는 캘린더, 플러피입니다🫧"),
-            const Text("현재 MVP로 수요도 조사를 진행 중입니다."),
-            const Text("원활한 이용을 위해 PC 전체화면을 권장합니다."),
+            const Text("글 작성을 통해 여러분의 의견을 들려주세요👂"),
+            const Text("의견을 남겨주신 분 중 총 3분께 커피 기프티콘을 드립니다!"),
+            const Text("이벤트 참여를 원하시면 전화번호를 기입해주시고, 원하지 않으신다면 빈칸으로 남겨주세요."),
             const SizedBox(
               height: 50,
             ),
@@ -63,7 +62,7 @@ class _StartPageState extends State<StartPage> {
               child: TextField(
                 controller: textEditingController,
                 decoration: const InputDecoration(
-                  hintText: "플러피에서 사용할 닉네임을 입력해주세요.",
+                  hintText: "ex. 01012345678",
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
@@ -73,33 +72,26 @@ class _StartPageState extends State<StartPage> {
             const SizedBox(
               height: 15.0,
             ),
-            isValid
-                ? const Text("")
-                : const Text(
-                    "닉네임은 최소 한 글자 이상이어야 합니다.",
-                    style: TextStyle(
-                      color: Colors.indigoAccent,
-                    ),
-                  ),
+            const Text(
+              "수요조사 기간이 끝난 후 전화전호 정보는 모두 폐기됩니다.",
+              style: TextStyle(
+                color: Colors.indigoAccent,
+              ),
+            ),
             const SizedBox(
               height: 40,
             ),
             TextButton(
               onPressed: () {
-                if (checkValidNickname(textEditingController.text)) {
-                  isValid = true;
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PhoneNumPage(),
-                    ),
-                  );
-                } else {
-                  isValid = false;
-                }
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CalendarPage(),
+                  ),
+                );
               },
               child: const Text(
-                "이 닉네임으로 할래요 🙋🏻‍♀️",
+                "확인했습니다! 🙆🏻‍♀️",
                 style: TextStyle(
                   fontSize: 15.0,
                   fontWeight: FontWeight.w300,
