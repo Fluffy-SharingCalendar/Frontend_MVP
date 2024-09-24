@@ -1,6 +1,8 @@
-import 'package:fluffy_mvp/pages/calendar_page.dart';
+import 'package:fluffy_mvp/widgets/profile_image.dart';
 import 'package:fluffy_mvp/pages/phone_num_page.dart';
+import 'package:fluffy_mvp/models/profile_image_list.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class StartPage extends StatefulWidget {
   const StartPage({
@@ -15,8 +17,20 @@ class _StartPageState extends State<StartPage> {
   TextEditingController textEditingController = TextEditingController();
   bool isValid = false;
 
+  List<String> profileImageList = ProfileImageList.profileImages;
+  Random random = Random();
+  late int index;
+
   bool checkValidNickname(String nickname) {
     return nickname.isNotEmpty;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      index = random.nextInt(profileImageList.length);
+    });
   }
 
   @override
@@ -43,6 +57,10 @@ class _StartPageState extends State<StartPage> {
             const Text("원활한 이용을 위해 PC 전체화면을 권장합니다."),
             const SizedBox(
               height: 50,
+            ),
+            const ProfileImage(),
+            const SizedBox(
+              height: 30.0,
             ),
             Container(
               width: 500.0,
