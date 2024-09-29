@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/services/color_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
 
@@ -5,47 +6,81 @@ class EventMarker extends StatefulWidget {
   const EventMarker({
     super.key,
     required this.event,
+    required this.isFirst,
+    required this.isLast,
   });
 
   final Event event;
+  final bool isFirst;
+  final bool isLast;
 
   @override
   _EventMarkerState createState() => _EventMarkerState();
 }
 
 class _EventMarkerState extends State<EventMarker> {
-  Color eventMarkerColor = const Color.fromARGB(255, 131, 117, 255);
+  late Color eventMarkerColor;
+
+  @override
+  void initState() {
+    super.initState();
+    eventMarkerColor = hexToColor(widget.event.color);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10.0),
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
         color: eventMarkerColor.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(5.0),
-        border: Border.all(color: eventMarkerColor),
+        borderRadius: BorderRadius.horizontal(
+          left: widget.isFirst ? const Radius.circular(5.0) : Radius.zero,
+          right: widget.isLast ? const Radius.circular(5.0) : Radius.zero,
+        ),
+        border: Border(
+          left: widget.isFirst
+              ? BorderSide(color: eventMarkerColor)
+              : BorderSide.none,
+          right: widget.isLast
+              ? BorderSide(color: eventMarkerColor)
+              : BorderSide.none,
+          top: BorderSide(color: eventMarkerColor),
+          bottom: BorderSide(color: eventMarkerColor),
+        ),
       ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.event,
-            color: eventMarkerColor,
-            size: 13.0,
-          ),
-          const SizedBox(width: 5.0),
-          Expanded(
-            child: Text(
-              widget.event.title,
-              style: const TextStyle(
-                fontSize: 10.0,
-                color: Colors.black87,
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
+      child: widget.isFirst
+          ? Row(
+              children: [
+                Icon(
+                  Icons.event,
+                  color: eventMarkerColor,
+                  size: 13.0,
+                ),
+                const SizedBox(width: 5.0),
+                Expanded(
+                  child: Text(
+                    widget.event.title,
+                    style: const TextStyle(
+                      fontSize: 10.0,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ],
+            )
+          : const Row(
+              children: [
+                Text(
+                  "",
+                  style: TextStyle(
+                    fontSize: 10.0,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
