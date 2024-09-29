@@ -17,8 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fluffy MVP',
       debugShowCheckedModeBanner: false,
-      // initialRoute: '/start',
-      initialRoute: '/sharing_memory',
+      initialRoute: '/start',
       routes: {
         '/calendar': (context) => const CalendarPage(),
         '/start': (context) => const StartPage(),
