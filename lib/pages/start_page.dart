@@ -1,8 +1,7 @@
+import 'package:fluffy_mvp/models/login_model.dart';
 import 'package:fluffy_mvp/widgets/profile_image.dart';
 import 'package:fluffy_mvp/pages/phone_num_page.dart';
-import 'package:fluffy_mvp/models/profile_image_list.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 class StartPage extends StatefulWidget {
   const StartPage({
@@ -16,10 +15,7 @@ class StartPage extends StatefulWidget {
 class _StartPageState extends State<StartPage> {
   TextEditingController textEditingController = TextEditingController();
   bool isValid = false;
-
-  List<String> profileImageList = ProfileImageList.profileImages;
-  Random random = Random();
-  late int index;
+  int selectedIndex = 0;
 
   bool checkValidNickname(String nickname) {
     return nickname.isNotEmpty;
@@ -28,9 +24,6 @@ class _StartPageState extends State<StartPage> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      index = random.nextInt(profileImageList.length);
-    });
   }
 
   @override
@@ -38,10 +31,8 @@ class _StartPageState extends State<StartPage> {
     return Scaffold(
       body: Center(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(
-              height: 120.0,
-            ),
             const Text(
               "Fluffy",
               style: TextStyle(
@@ -58,7 +49,13 @@ class _StartPageState extends State<StartPage> {
             const SizedBox(
               height: 50,
             ),
-            const ProfileImage(),
+            ProfileImage(
+              indexChanged: (newIndex) {
+                setState(() {
+                  selectedIndex = newIndex;
+                });
+              },
+            ),
             const SizedBox(
               height: 30.0,
             ),
@@ -106,10 +103,18 @@ class _StartPageState extends State<StartPage> {
               onPressed: () {
                 if (checkValidNickname(textEditingController.text)) {
                   isValid = true;
+
+                  Login login = Login(
+                    nickname: textEditingController.text,
+                    profileImageIndex: selectedIndex,
+                  );
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PhoneNumPage(),
+                      builder: (context) => PhoneNumPage(
+                        login: login,
+                      ),
                     ),
                   );
                 } else {

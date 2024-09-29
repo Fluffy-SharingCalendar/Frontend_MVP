@@ -1,10 +1,14 @@
 import 'package:fluffy_mvp/pages/calendar_page.dart';
+import 'package:fluffy_mvp/models/login_model.dart';
 import 'package:flutter/material.dart';
 
 class PhoneNumPage extends StatefulWidget {
   const PhoneNumPage({
     super.key,
+    this.login,
   });
+
+  final Login? login;
 
   @override
   State<PhoneNumPage> createState() => _PhoneNumPageState();

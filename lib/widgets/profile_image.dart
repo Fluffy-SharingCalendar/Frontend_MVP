@@ -5,7 +5,10 @@ import 'dart:math';
 class ProfileImage extends StatefulWidget {
   const ProfileImage({
     super.key,
+    required this.indexChanged,
   });
+
+  final Function(int) indexChanged;
 
   @override
   State<ProfileImage> createState() => _ProfileImageState();
@@ -21,6 +24,9 @@ class _ProfileImageState extends State<ProfileImage> {
     super.initState();
     setState(() {
       index = random.nextInt(profileImageList.length);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.indexChanged(index);
     });
   }
 
@@ -55,6 +61,8 @@ class _ProfileImageState extends State<ProfileImage> {
               setState(() {
                 index = (index + 1) % profileImageList.length;
               });
+
+              widget.indexChanged(index);
             },
             child: Container(
               width: 30,
