@@ -1,4 +1,4 @@
-import 'package:fluffy_mvp/pages/calendar_page.dart';
+import 'package:fluffy_mvp/pages/sharing_memory_page.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:typed_data';
@@ -42,7 +42,7 @@ class _PostArticlePageState extends State<PostArticlePage> {
       body: Center(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 15.0),
-          width: screenSize.width * 0.5,
+          width: screenSize.width * 0.4,
           height: screenSize.height,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -71,8 +71,7 @@ class _PostArticlePageState extends State<PostArticlePage> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const CalendarPage(), // 추억페이지로 변경 필요
+                        builder: (context) => const SharingMemoryPage(),
                       ),
                     );
                   }),
