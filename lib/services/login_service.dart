@@ -11,11 +11,7 @@ class LoginService extends Auth {
     try {
       var response = await http.post(
         Uri.parse(url),
-        body: jsonEncode({
-          "nickname": login.nickname,
-          "phoneNumber": login.phoneNumber,
-          "profileImageIndex": login.profileImageIndex,
-        }),
+        body: jsonEncode(login.toJson()),
       );
 
       print(response.statusCode);

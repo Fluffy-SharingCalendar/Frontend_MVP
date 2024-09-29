@@ -10,7 +10,7 @@ class Calendar extends StatefulWidget {
     required this.onDaySelected,
   });
 
-  final Map<DateTime, List<Event>> events;
+  final List<Event> events;
   final ValueChanged<DateTime> onDaySelected;
 
   @override
@@ -24,7 +24,13 @@ class _CalendarState extends State<Calendar> {
   final CalendarFormat _calendarFormat = CalendarFormat.month;
 
   List<Event> _getEventsForDay(DateTime day) {
-    return widget.events[day] ?? [];
+    return widget.events.where((event) {
+      DateTime startDate = DateTime.parse(event.startDate.replaceAll('.', '-'));
+      DateTime endDate = DateTime.parse(event.endDate.replaceAll('.', '-'));
+
+      return (isSameDay(day, startDate) || day.isAfter(startDate)) &&
+          (isSameDay(day, endDate) || day.isBefore(endDate));
+    }).toList();
   }
 
   @override
@@ -35,9 +41,9 @@ class _CalendarState extends State<Calendar> {
         vertical: 15.0,
       ),
       child: TableCalendar<Event>(
-        focusedDay: DateTime.now(),
+        focusedDay: _focusedDay,
         firstDay: DateTime.utc(2024, 9, 1),
-        lastDay: DateTime.utc(2024, 12, 31),
+        lastDay: DateTime.utc(2024, 10, 31),
         selectedDayPredicate: (day) {
           return isSameDay(_selectedDay, day);
         },
@@ -55,49 +61,62 @@ class _CalendarState extends State<Calendar> {
         eventLoader: _getEventsForDay,
         rowHeight: 100.0,
         calendarBuilders: CalendarBuilders(
-            selectedBuilder: (context, date, events) => Center(
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFd8d7e4),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        date.day.toString(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
+          selectedBuilder: (context, date, events) => Center(
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: Color(0xFFd8d7e4),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  date.day.toString(),
+                  style: const TextStyle(color: Colors.white),
                 ),
-            todayBuilder: (context, date, events) => Center(
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFadb9ca),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        date.day.toString(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
+              ),
+            ),
+          ),
+          todayBuilder: (context, date, events) => Center(
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: Color(0xFFadb9ca),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  date.day.toString(),
+                  style: const TextStyle(color: Colors.white),
                 ),
-            markerBuilder: (context, date, events) {
-              if (events.isEmpty) return const SizedBox();
+              ),
+            ),
+          ),
+          markerBuilder: (context, date, events) {
+            if (events.isEmpty) return const SizedBox();
 
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: events.map((event) {
-                  return EventMarker(event: event);
-                }).toList(),
-              );
-            }),
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: events.map((event) {
+                DateTime startDate =
+                    DateTime.parse(event.startDate.replaceAll('.', '-'));
+                DateTime endDate =
+                    DateTime.parse(event.endDate.replaceAll('.', '-'));
+
+                bool isFirst = isSameDay(date, startDate);
+                bool isLast = isSameDay(date, endDate);
+
+                return EventMarker(
+                  event: event,
+                  isFirst: isFirst,
+                  isLast: isLast,
+                );
+              }).toList(),
+            );
+          },
+        ),
       ),
     );
   }

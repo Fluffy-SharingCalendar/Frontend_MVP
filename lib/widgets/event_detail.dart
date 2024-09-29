@@ -19,8 +19,6 @@ class EventDetail extends StatefulWidget {
 }
 
 class _EventDetailState extends State<EventDetail> {
-  Color eventDeEventDetailEventDetailColor =
-      const Color.fromARGB(255, 131, 117, 255);
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -77,7 +75,7 @@ class _EventDetailState extends State<EventDetail> {
               width: 5.0,
             ),
             Text(
-              "${widget.event.startDate.year}. ${widget.event.startDate.month}. ${widget.event.startDate.day}",
+              widget.event.startDate,
             ),
             const Padding(
               padding: EdgeInsets.symmetric(
@@ -90,7 +88,7 @@ class _EventDetailState extends State<EventDetail> {
               ),
             ),
             Text(
-              "${widget.event.finishDate.year}. ${widget.event.finishDate.month}. ${widget.event.finishDate.day}",
+              widget.event.endDate,
             ),
           ],
         ),

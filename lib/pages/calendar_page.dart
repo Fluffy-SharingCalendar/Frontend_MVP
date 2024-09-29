@@ -2,7 +2,6 @@ import 'package:fluffy_mvp/widgets/event_detail_modal.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fluffy_mvp/models/event_model.dart';
-
 import 'package:fluffy_mvp/widgets/calendar.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -19,22 +18,22 @@ class _CalendarPageState extends State<CalendarPage> {
   List<Event> _selectedEvents = [];
   DateTime? _selectedDay;
 
-  final Map<DateTime, List<Event>> _events = {
-    DateTime.utc(2024, 9, 10): [
-      Event(
-        '플러터 공부하기',
-        DateTime.utc(2024, 9, 10),
-        DateTime.utc(2024, 9, 10),
-      ),
-    ],
-    DateTime.utc(2024, 9, 12): [
-      Event(
-        '후추랑 놀기',
-        DateTime.utc(2024, 9, 12),
-        DateTime.utc(2024, 9, 12),
-      ),
-    ],
-  };
+  // Event 리스트
+  final List<Event> _events = [
+    Event(
+      eventId: 1,
+      title: "FeedBack",
+      color: "#A6DAF4",
+      startDate: "2024.10.01",
+      endDate: "2024.10.09",
+    ),
+    Event(
+        eventId: 2,
+        title: "방명록",
+        color: "#0047AB",
+        startDate: "2024.10.23",
+        endDate: "2024.10.26"),
+  ];
 
   void toggleDetail(bool isOpend) {
     setState(() {
@@ -43,8 +42,19 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void selectDate(DateTime selectedDay) {
-    _selectedEvents = _events[selectedDay] ?? [];
-    _selectedDay = selectedDay;
+    setState(() {
+      _selectedEvents = _events.where((event) {
+        DateTime startDate =
+            DateTime.parse(event.startDate.replaceAll('.', '-'));
+        DateTime endDate = DateTime.parse(event.endDate.replaceAll('.', '-'));
+
+        return selectedDay
+                .isAfter(startDate.subtract(const Duration(days: 1))) &&
+            selectedDay.isBefore(endDate.add(const Duration(days: 1)));
+      }).toList();
+
+      _selectedDay = selectedDay;
+    });
   }
 
   @override

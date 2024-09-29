@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
+import 'package:fluffy_mvp/services/color_service.dart';
 
 class EventDetailMarker extends StatefulWidget {
   const EventDetailMarker({
@@ -14,7 +15,14 @@ class EventDetailMarker extends StatefulWidget {
 }
 
 class _EventDetailMarkerState extends State<EventDetailMarker> {
-  Color eventMarkerColor = const Color.fromARGB(255, 131, 117, 255);
+  late Color eventMarkerColor;
+
+  @override
+  void initState() {
+    super.initState();
+    eventMarkerColor = hexToColor(widget.event.color);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
