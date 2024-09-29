@@ -1,14 +1,35 @@
 class Event {
+  final int eventId;
   final String title;
-  final DateTime startDate;
-  final DateTime finishDate;
+  final String color;
+  final String startDate;
+  final String endDate;
 
-  const Event(
-    this.title,
-    this.startDate,
-    this.finishDate,
-  );
+  Event({
+    required this.eventId,
+    required this.title,
+    required this.color,
+    required this.startDate,
+    required this.endDate,
+  });
 
-  @override
-  String toString() => title;
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(
+      eventId: json['eventId'],
+      title: json['title'],
+      color: json['color'],
+      startDate: json['startDate'],
+      endDate: json['endDate'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'eventId': eventId,
+      'title': title,
+      'color': color,
+      'startDate': startDate,
+      'endDate': endDate,
+    };
+  }
 }

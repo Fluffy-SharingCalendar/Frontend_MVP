@@ -67,19 +67,19 @@ class _EventDetailState extends State<EventDetail> {
         const SizedBox(
           height: 5.0,
         ),
-        Row(
+        const Row(
           children: [
-            const Icon(
+            Icon(
               Icons.date_range,
               color: Colors.black54,
             ),
-            const SizedBox(
+            SizedBox(
               width: 5.0,
             ),
-            Text(
-              "${widget.event.startDate.year}. ${widget.event.startDate.month}. ${widget.event.startDate.day}",
-            ),
-            const Padding(
+            Text("년.월.일"
+                // "${widget.event.startDate.year}. ${widget.event.startDate.month}. ${widget.event.startDate.day}",
+                ),
+            Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 5.0,
               ),
@@ -89,9 +89,9 @@ class _EventDetailState extends State<EventDetail> {
                 size: 15.0,
               ),
             ),
-            Text(
-              "${widget.event.finishDate.year}. ${widget.event.finishDate.month}. ${widget.event.finishDate.day}",
-            ),
+            Text("년.월.일"
+                //"${widget.event.finishDate.year}. ${widget.event.finishDate.month}. ${widget.event.finishDate.day}",
+                ),
           ],
         ),
         const SizedBox(

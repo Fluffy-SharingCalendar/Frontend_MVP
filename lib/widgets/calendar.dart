@@ -37,7 +37,7 @@ class _CalendarState extends State<Calendar> {
       child: TableCalendar<Event>(
         focusedDay: DateTime.now(),
         firstDay: DateTime.utc(2024, 9, 1),
-        lastDay: DateTime.utc(2024, 12, 31),
+        lastDay: DateTime.utc(2024, 10, 31),
         selectedDayPredicate: (day) {
           return isSameDay(_selectedDay, day);
         },
