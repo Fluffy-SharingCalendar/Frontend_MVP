@@ -105,8 +105,8 @@ class _CalendarState extends State<Calendar> {
                 DateTime endDate =
                     DateTime.parse(event.endDate.replaceAll('.', '-'));
 
-                bool isFirst = isSameDay(date, startDate); // 시작일 확인
-                bool isLast = isSameDay(date, endDate); // 종료일 확인
+                bool isFirst = isSameDay(date, startDate);
+                bool isLast = isSameDay(date, endDate);
 
                 return EventMarker(
                   event: event,

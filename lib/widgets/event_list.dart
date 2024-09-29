@@ -21,7 +21,6 @@ class EventList extends StatefulWidget {
 }
 
 class _EventListState extends State<EventList> {
-  Color eventListEventListColor = const Color.fromARGB(255, 131, 117, 255);
   @override
   Widget build(BuildContext context) {
     return Column(

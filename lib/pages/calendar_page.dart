@@ -35,22 +35,19 @@ class _CalendarPageState extends State<CalendarPage> {
         endDate: "2024.10.26"),
   ];
 
-  // 상세보기 토글 함수
   void toggleDetail(bool isOpend) {
     setState(() {
       _isDetailOpend = isOpend;
     });
   }
 
-  // 날짜를 선택했을 때 해당 날짜에 맞는 이벤트를 찾는 함수
   void selectDate(DateTime selectedDay) {
     setState(() {
-      // 선택된 날짜와 겹치는 이벤트들을 필터링
       _selectedEvents = _events.where((event) {
-        DateTime startDate = DateTime.parse(event.startDate);
-        DateTime endDate = DateTime.parse(event.endDate);
+        DateTime startDate =
+            DateTime.parse(event.startDate.replaceAll('.', '-'));
+        DateTime endDate = DateTime.parse(event.endDate.replaceAll('.', '-'));
 
-        // 선택된 날짜가 이벤트의 시작일과 종료일 사이에 있는지 확인
         return selectedDay
                 .isAfter(startDate.subtract(const Duration(days: 1))) &&
             selectedDay.isBefore(endDate.add(const Duration(days: 1)));
