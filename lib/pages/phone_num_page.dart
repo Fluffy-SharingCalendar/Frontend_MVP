@@ -29,10 +29,9 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(
-              height: 120.0,
-            ),
             const Text(
               "Fluffy",
               style: TextStyle(

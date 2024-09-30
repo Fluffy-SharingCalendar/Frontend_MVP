@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/services/event_service.dart';
 import 'package:fluffy_mvp/widgets/event_detail_modal.dart';
 import 'package:flutter/material.dart';
 
@@ -17,23 +18,24 @@ class _CalendarPageState extends State<CalendarPage> {
   bool _isDetailOpend = false;
   List<Event> _selectedEvents = [];
   DateTime? _selectedDay;
+  List<Event> _events = [];
 
-  // Event 리스트
-  final List<Event> _events = [
-    Event(
-      eventId: 1,
-      title: "FeedBack",
-      color: "#A6DAF4",
-      startDate: "2024.10.01",
-      endDate: "2024.10.09",
-    ),
-    Event(
-        eventId: 2,
-        title: "방명록",
-        color: "#0047AB",
-        startDate: "2024.10.23",
-        endDate: "2024.10.26"),
-  ];
+  // // Event 리스트
+  // final List<Event> _events = [
+  //   Event(
+  //     eventId: 1,
+  //     title: "FeedBack",
+  //     color: "#A6DAF4",
+  //     startDate: "2024.10.01",
+  //     endDate: "2024.10.09",
+  //   ),
+  //   Event(
+  //       eventId: 2,
+  //       title: "방명록",
+  //       color: "#0047AB",
+  //       startDate: "2024.10.23",
+  //       endDate: "2024.10.26"),
+  // ];
 
   void toggleDetail(bool isOpend) {
     setState(() {
@@ -55,6 +57,20 @@ class _CalendarPageState extends State<CalendarPage> {
 
       _selectedDay = selectedDay;
     });
+  }
+
+  void _getEvents() async {
+    List<Event> futureEvents = await EventService.getEvents();
+    setState(() {
+      _events = futureEvents;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getEvents();
+    print(_events);
   }
 
   @override

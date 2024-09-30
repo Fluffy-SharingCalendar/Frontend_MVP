@@ -17,8 +17,9 @@ class LoginService extends Auth {
       print(response.statusCode);
 
       if (response.statusCode == 200) {
-        print("로그인 성공");
-        print(utf8.decode(response.bodyBytes));
+        print("headers : ${response.headers}");
+        print("body : ${utf8.decode(response.bodyBytes)}");
+
         return true;
       } else {
         print("로그인 실패: ${response.statusCode}");
