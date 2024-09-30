@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/pages/post_article_page.dart';
 import 'package:fluffy_mvp/widgets/comment.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/widgets/article.dart';
@@ -28,6 +29,19 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("추억 공유하기"),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const PostArticlePage()),
+          );
+        },
+        backgroundColor: const Color.fromARGB(255, 213, 125, 229),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
