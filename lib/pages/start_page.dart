@@ -1,6 +1,8 @@
 import 'package:fluffy_mvp/models/login_model.dart';
+import 'package:fluffy_mvp/services/login_service.dart';
 import 'package:fluffy_mvp/widgets/profile_image.dart';
 import 'package:fluffy_mvp/pages/phone_num_page.dart';
+import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:flutter/material.dart';
 
 class StartPage extends StatefulWidget {
@@ -14,11 +16,19 @@ class StartPage extends StatefulWidget {
 
 class _StartPageState extends State<StartPage> {
   TextEditingController textEditingController = TextEditingController();
-  bool isValid = false;
   int selectedIndex = 0;
 
-  bool checkValidNickname(String nickname) {
-    return nickname.isNotEmpty;
+  Future<bool> checkValidNickname(
+    String nickname,
+  ) async {
+    if (nickname.isEmpty || nickname.length > 25) {
+      await alert(context, "유효하지 않은 닉네임", "닉네임의 길이는 1자 이상 25자 이하입니다.");
+    } else if (!await LoginService.checkNickname(nickname)) {
+      await alert(context, "유효하지 않은 닉네임", "중복된 닉네임 입니다.");
+    } else {
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -89,22 +99,12 @@ class _StartPageState extends State<StartPage> {
             const SizedBox(
               height: 15.0,
             ),
-            isValid
-                ? const Text("")
-                : const Text(
-                    "닉네임은 최소 한 글자 이상이어야 합니다.",
-                    style: TextStyle(
-                      color: Colors.indigoAccent,
-                    ),
-                  ),
             const SizedBox(
               height: 40,
             ),
             TextButton(
-              onPressed: () {
-                if (checkValidNickname(textEditingController.text)) {
-                  isValid = true;
-
+              onPressed: () async {
+                if (await checkValidNickname(textEditingController.text)) {
                   Login login = Login(
                     nickname: textEditingController.text,
                     profileImageIndex: selectedIndex,
@@ -118,8 +118,6 @@ class _StartPageState extends State<StartPage> {
                       ),
                     ),
                   );
-                } else {
-                  isValid = false;
                 }
               },
               child: const Text(

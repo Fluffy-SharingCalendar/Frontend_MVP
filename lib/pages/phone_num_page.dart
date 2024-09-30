@@ -29,10 +29,9 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(
-              height: 120.0,
-            ),
             const Text(
               "Fluffy",
               style: TextStyle(
@@ -91,15 +90,7 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
               onPressed: () async {
                 widget.login!.phoneNumber = textEditingController.text;
 
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CalendarPage(),
-                  ),
-                );
-
                 bool loginSuccess = await LoginService.login(widget.login!);
-
                 if (loginSuccess) {
                   Navigator.pushReplacement(
                     context,

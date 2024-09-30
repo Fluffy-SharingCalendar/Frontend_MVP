@@ -1,10 +1,12 @@
+import 'package:fluffy_mvp/services/event_service.dart';
 import 'package:fluffy_mvp/widgets/sharing_memory_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:intl/intl.dart';
+import 'package:fluffy_mvp/models/event_detail_model.dart';
 
-class EventDetail extends StatefulWidget {
-  const EventDetail({
+class EventDetailView extends StatefulWidget {
+  const EventDetailView({
     super.key,
     required this.selectedDay,
     required this.event,
@@ -16,13 +18,29 @@ class EventDetail extends StatefulWidget {
   final VoidCallback onBack;
 
   @override
-  _EventDetailState createState() => _EventDetailState();
+  _EventDetailViewState createState() => _EventDetailViewState();
 }
 
-class _EventDetailState extends State<EventDetail> {
+class _EventDetailViewState extends State<EventDetailView> {
+  late EventDetail eventDetail;
+
   String formatDate(DateTime date) {
     final DateFormat formatter = DateFormat('yyyy.MM.dd');
     return formatter.format(date);
+  }
+
+  void _getEventDetailView() async {
+    EventDetail futureEvent =
+        await EventService.getEventDetail(widget.event.eventId);
+
+    setState(() {
+      eventDetail = futureEvent;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override

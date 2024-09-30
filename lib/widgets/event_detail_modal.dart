@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fluffy_mvp/widgets/event_list.dart';
-import 'package:fluffy_mvp/widgets/event_detail.dart';
+import 'package:fluffy_mvp/widgets/event_detail_view.dart';
 
 import 'package:fluffy_mvp/models/event_model.dart';
 
@@ -41,7 +41,7 @@ class _EventDetailModalState extends State<EventDetailModal> {
       child: Padding(
         padding: const EdgeInsets.all(18.0),
         child: isClickedDetail
-            ? EventDetail(
+            ? EventDetailView(
                 selectedDay: widget.selectedDay,
                 event: selectedEvent!,
                 onBack: () => toggleClicked(false, null),
