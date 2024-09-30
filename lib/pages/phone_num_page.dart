@@ -1,6 +1,6 @@
 import 'package:fluffy_mvp/pages/calendar_page.dart';
 import 'package:fluffy_mvp/models/login_model.dart';
-import 'package:fluffy_mvp/services/event_service.dart';
+import 'package:fluffy_mvp/services/login_service.dart';
 import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:flutter/material.dart';
 
@@ -98,18 +98,18 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
                   ),
                 );
 
-                // bool loginSuccess = await LoginService.login(widget.login!);
+                bool loginSuccess = await LoginService.login(widget.login!);
 
-                // if (loginSuccess) {
-                //   Navigator.pushReplacement(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => const CalendarPage(),
-                //     ),
-                //   );
-                // } else {
-                //   alert(context, "로그인 실패", "로그인에 실패했습니다.");
-                // }
+                if (loginSuccess) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CalendarPage(),
+                    ),
+                  );
+                } else {
+                  alert(context, "로그인 실패", "로그인에 실패했습니다.");
+                }
               },
               child: const Text(
                 "확인했습니다! 🙆🏻‍♀️",

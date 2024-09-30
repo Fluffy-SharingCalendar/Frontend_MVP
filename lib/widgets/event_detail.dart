@@ -1,6 +1,7 @@
 import 'package:fluffy_mvp/widgets/sharing_memory_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
+import 'package:intl/intl.dart';
 
 class EventDetail extends StatefulWidget {
   const EventDetail({
@@ -19,6 +20,11 @@ class EventDetail extends StatefulWidget {
 }
 
 class _EventDetailState extends State<EventDetail> {
+  String formatDate(DateTime date) {
+    final DateFormat formatter = DateFormat('yyyy.MM.dd');
+    return formatter.format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -114,7 +120,10 @@ class _EventDetailState extends State<EventDetail> {
         const SizedBox(
           height: 10.0,
         ),
-        SharingMemoryButton(event: widget.event),
+        SharingMemoryButton(
+          event: widget.event,
+          selectedDay: formatDate(widget.selectedDay),
+        ),
       ],
     );
   }

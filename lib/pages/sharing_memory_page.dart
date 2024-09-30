@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:fluffy_mvp/pages/post_article_page.dart';
 import 'package:fluffy_mvp/widgets/comment.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,14 @@ import 'package:fluffy_mvp/widgets/article.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
 
 class SharingMemoryPage extends StatefulWidget {
-  const SharingMemoryPage({super.key});
+  const SharingMemoryPage({
+    super.key,
+    this.event,
+    this.selectedDay,
+  });
+
+  final Event? event;
+  final String? selectedDay;
 
   @override
   State<SharingMemoryPage> createState() => _SharingMemoryPageState();
@@ -34,7 +42,11 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const PostArticlePage()),
+            MaterialPageRoute(
+                builder: (context) => PostArticlePage(
+                      event: widget.event,
+                      selectedDay: widget.selectedDay,
+                    )),
           );
         },
         backgroundColor: const Color.fromARGB(255, 213, 125, 229),
@@ -61,8 +73,7 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
                 itemBuilder: (context, index) {
                   return Article(
                     height: screenSize.width * 0.4,
-                    onCommentPressed: () =>
-                        _toggleComments(true), // 댓글 아이콘 클릭 시
+                    onCommentPressed: () => _toggleComments(true),
                   );
                 },
               ),
