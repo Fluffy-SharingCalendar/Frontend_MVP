@@ -8,13 +8,11 @@ class EventService extends Auth {
   static Future<List<Event>> getEvents() async {
     const String url = "$domainUrl/api/calendars/:1/events";
 
-    print("jwt토큰 : ${Auth.jwtToken}");
-
     try {
       var response = await http.get(
         Uri.parse(url),
         headers: {
-          "Authorization": "Bearer ${Auth.jwtToken}",
+          "Authorization": Auth.jwtToken ?? "Null",
         },
       );
 
@@ -24,7 +22,6 @@ class EventService extends Auth {
 
         List<Event> events =
             responseData.map((event) => Event.fromJson(event)).toList();
-        print("이벤트 목록 받아오기 성공 : $events");
         return events;
       } else {
         throw Exception('캘린더 일정 목록 조회 실패 : ${response.statusCode}');
