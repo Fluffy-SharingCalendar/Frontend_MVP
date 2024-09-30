@@ -91,7 +91,6 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
                 widget.login!.phoneNumber = textEditingController.text;
 
                 bool loginSuccess = await LoginService.login(widget.login!);
-
                 if (loginSuccess) {
                   Navigator.pushReplacement(
                     context,

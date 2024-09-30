@@ -6,9 +6,11 @@ class SharingMemoryButton extends StatefulWidget {
   const SharingMemoryButton({
     super.key,
     required this.event,
+    required this.selectedDay,
   });
 
   final Event event;
+  final String selectedDay;
 
   @override
   _SharingMemoryButtonState createState() => _SharingMemoryButtonState();
@@ -21,7 +23,11 @@ class _SharingMemoryButtonState extends State<SharingMemoryButton> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const SharingMemoryPage()),
+          MaterialPageRoute(
+              builder: (context) => SharingMemoryPage(
+                    event: widget.event,
+                    selectedDay: widget.selectedDay,
+                  )),
         );
       },
       child: Container(

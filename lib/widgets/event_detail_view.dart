@@ -2,6 +2,7 @@ import 'package:fluffy_mvp/services/event_service.dart';
 import 'package:fluffy_mvp/widgets/sharing_memory_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
+import 'package:intl/intl.dart';
 import 'package:fluffy_mvp/models/event_detail_model.dart';
 
 class EventDetailView extends StatefulWidget {
@@ -22,6 +23,11 @@ class EventDetailView extends StatefulWidget {
 
 class _EventDetailViewState extends State<EventDetailView> {
   late EventDetail eventDetail;
+
+  String formatDate(DateTime date) {
+    final DateFormat formatter = DateFormat('yyyy.MM.dd');
+    return formatter.format(date);
+  }
 
   void _getEventDetailView() async {
     EventDetail futureEvent =
@@ -132,7 +138,10 @@ class _EventDetailViewState extends State<EventDetailView> {
         const SizedBox(
           height: 10.0,
         ),
-        SharingMemoryButton(event: widget.event),
+        SharingMemoryButton(
+          event: widget.event,
+          selectedDay: formatDate(widget.selectedDay),
+        ),
       ],
     );
   }

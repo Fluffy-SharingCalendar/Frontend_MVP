@@ -1,10 +1,21 @@
+import 'package:fluffy_mvp/models/posting_model.dart';
 import 'package:fluffy_mvp/pages/sharing_memory_page.dart';
+import 'package:fluffy_mvp/services/post_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fluffy_mvp/models/event_model.dart';
 import 'dart:typed_data';
+import 'dart:convert';
 
 class PostArticlePage extends StatefulWidget {
-  const PostArticlePage({super.key});
+  const PostArticlePage({
+    super.key,
+    this.event,
+    this.selectedDay,
+  });
+
+  final Event? event;
+  final String? selectedDay;
 
   @override
   State<PostArticlePage> createState() => _PostArticlePageState();
@@ -29,6 +40,13 @@ class _PostArticlePageState extends State<PostArticlePage> {
 
   bool isValid() {
     return _textController.text.isNotEmpty;
+  }
+
+  List<String> _convertToBase64(List<Uint8List?> imageBytesList) {
+    return imageBytesList
+        .where((bytes) => bytes != null)
+        .map((bytes) => base64Encode(bytes!))
+        .toList();
   }
 
   @override
@@ -68,6 +86,18 @@ class _PostArticlePageState extends State<PostArticlePage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SubmitButton(onSubmit: () {
+                    List<String> base64Images =
+                        _convertToBase64(_imageBytesList);
+
+                    Posting posting = Posting(
+                      eventId: widget.event!.eventId,
+                      eventDate: widget.selectedDay ?? "Null",
+                      content: _textController.text,
+                      files: base64Images,
+                    );
+
+                    PostService.postArticle(posting);
+
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
