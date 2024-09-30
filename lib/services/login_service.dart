@@ -34,11 +34,16 @@ class LoginService extends Auth {
     try {
       var response = await http.post(
         Uri.parse(url),
-        body: nickname,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        body: jsonEncode({
+          'nickname': nickname,
+        }),
       );
 
       print(response.statusCode);
-      if (response.statusCode == 204) {
+      if (response.statusCode == 200) {
         return true;
       } else {
         return false;
