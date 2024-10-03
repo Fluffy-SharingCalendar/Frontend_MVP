@@ -1,9 +1,13 @@
+import 'package:fluffy_mvp/models/article_model.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:fluffy_mvp/pages/post_article_page.dart';
+import 'package:fluffy_mvp/providers/post_provider.dart';
 import 'package:fluffy_mvp/widgets/comment.dart';
 import 'package:flutter/material.dart';
-import 'package:fluffy_mvp/widgets/article.dart';
+import 'package:fluffy_mvp/widgets/article_widget.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
+import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 
 class SharingMemoryPage extends StatefulWidget {
   const SharingMemoryPage({
@@ -20,6 +24,11 @@ class SharingMemoryPage extends StatefulWidget {
 }
 
 class _SharingMemoryPageState extends State<SharingMemoryPage> {
+  final ScrollController _scrollController = ScrollController(
+    keepScrollOffset: true,
+  );
+  int page = 0;
+
   List<String> profileImageList = ProfileImageList.profileImages;
   bool isCommentPressed = false;
 
@@ -31,7 +40,21 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
+    postProvider.getInitialArticles(widget.event!.eventId);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -64,16 +87,27 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
             profileImageList: profileImageList,
           ),
           // 글 섹션
-          SizedBox(
-            width: screenSize.width * 0.4,
-            height: screenSize.height,
-            child: Expanded(
+          Expanded(
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                // 스크롤이 끝에 도달했을 때 데이터를 추가로 로드
+                if (!postProvider.loading &&
+                    scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent) {
+                  page++;
+                  postProvider.getMoreArticles(widget.event!.eventId, page);
+                  return true; // 알림이 처리되었음을 알림
+                }
+                return false; // 알림을 다른 위젯으로 전달
+              },
               child: ListView.builder(
-                itemCount: 5,
+                controller: _scrollController,
+                itemCount: postProvider.articles.length,
                 itemBuilder: (context, index) {
-                  return Article(
+                  return ArticleWidget(
                     height: screenSize.width * 0.4,
                     onCommentPressed: () => _toggleComments(true),
+                    article: postProvider.articles[index],
                   );
                 },
               ),

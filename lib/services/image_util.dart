@@ -36,10 +36,6 @@ class ImageUtil {
       ))!;
     }
 
-    // 파일 크기 확인
-    File file = File(imagePath);
-    print('원본 파일 크기: ${file.lengthSync()} bytes');
-
     List<int> imageData = await compressImage(1.0);
 
     while (imageData.length > maxSizeInBytes && compressionQuality > 0) {

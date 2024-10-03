@@ -70,7 +70,6 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     _getEvents();
-    print(_events);
   }
 
   @override

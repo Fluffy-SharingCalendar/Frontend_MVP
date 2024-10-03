@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:fluffy_mvp/models/article_model.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:fluffy_mvp/models/auth_model.dart';
 import 'package:fluffy_mvp/models/posting_model.dart';
 import 'package:http/http.dart' as http;
 
 class PostService extends Auth {
+  // 게시글 등록
   static Future<bool> postArticle(Posting posting) async {
     final String url = "$domainUrl/api/post/${posting.eventId}";
 
@@ -55,6 +57,33 @@ class PostService extends Auth {
       }
     } catch (e) {
       throw Exception("게시글 작성 중 에러 발생: $e");
+    }
+  }
+
+  // 게시글 전체 조회
+  static Future<List<Article>> getArticles(int eventId, int page) async {
+    final String url = "$domainUrl/api/posts/$eventId?page=$page";
+    print(page);
+
+    try {
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Authorization": Auth.jwtToken ?? "Null",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(utf8.decode(response.bodyBytes));
+        ArticleResponse articleResponse =
+            ArticleResponse.fromJson(responseData);
+        print(articleResponse.posts);
+        return articleResponse.posts;
+      } else {
+        throw Exception('일정 상세 조회 실패 : ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception(e);
     }
   }
 }

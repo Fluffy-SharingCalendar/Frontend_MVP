@@ -4,9 +4,18 @@ import 'package:fluffy_mvp/pages/sharing_memory_page.dart';
 import 'package:fluffy_mvp/pages/start_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/pages/calendar_page.dart';
+import 'package:provider/provider.dart';
+import 'package:fluffy_mvp/providers/post_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => PostProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

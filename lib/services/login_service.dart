@@ -27,8 +27,6 @@ class LoginService extends Auth {
   }
 
   static Future<bool> checkNickname(String nickname) async {
-    print("닉네임 중복 체크");
-    print(nickname);
     const String url = "$domainUrl/api/users/validation";
 
     try {
@@ -42,7 +40,6 @@ class LoginService extends Auth {
         }),
       );
 
-      print(response.statusCode);
       if (response.statusCode == 200) {
         return true;
       } else {
