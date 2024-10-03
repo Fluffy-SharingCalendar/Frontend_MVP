@@ -66,7 +66,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 15.0,
-              vertical: 15.0,
+              vertical: 10.0,
             ),
             child: Text(
               widget.article.content,

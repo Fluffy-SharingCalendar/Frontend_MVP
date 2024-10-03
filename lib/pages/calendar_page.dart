@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/models/login_model.dart';
 import 'package:fluffy_mvp/services/event_service.dart';
 import 'package:fluffy_mvp/widgets/event_detail_modal.dart';
 import 'package:flutter/material.dart';

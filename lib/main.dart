@@ -2,6 +2,7 @@ import 'package:fluffy_mvp/pages/phone_num_page.dart';
 import 'package:fluffy_mvp/pages/post_article_page.dart';
 import 'package:fluffy_mvp/pages/sharing_memory_page.dart';
 import 'package:fluffy_mvp/pages/start_page.dart';
+import 'package:fluffy_mvp/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/pages/calendar_page.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => PostProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: const MyApp(),
     ),

@@ -1,4 +1,3 @@
-import 'package:fluffy_mvp/models/article_model.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:fluffy_mvp/pages/post_article_page.dart';
 import 'package:fluffy_mvp/providers/post_provider.dart';
@@ -6,8 +5,8 @@ import 'package:fluffy_mvp/widgets/comment.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/widgets/article_widget.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:fluffy_mvp/providers/user_provider.dart';
 
 class SharingMemoryPage extends StatefulWidget {
   const SharingMemoryPage({
@@ -90,15 +89,14 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
           Expanded(
             child: NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
-                // 스크롤이 끝에 도달했을 때 데이터를 추가로 로드
                 if (!postProvider.loading &&
                     scrollInfo.metrics.pixels ==
                         scrollInfo.metrics.maxScrollExtent) {
                   page++;
                   postProvider.getMoreArticles(widget.event!.eventId, page);
-                  return true; // 알림이 처리되었음을 알림
+                  return true;
                 }
-                return false; // 알림을 다른 위젯으로 전달
+                return false;
               },
               child: ListView.builder(
                 controller: _scrollController,
@@ -145,6 +143,7 @@ class ProfileSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return IntrinsicHeight(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
@@ -171,7 +170,8 @@ class ProfileSection extends StatelessWidget {
                 height: 100,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(profileImageList[0]),
+                    image: AssetImage(profileImageList[
+                        userProvider.login!.profileImageIndex]),
                     fit: BoxFit.cover,
                   ),
                   borderRadius: BorderRadius.circular(10),
@@ -184,19 +184,19 @@ class ProfileSection extends StatelessWidget {
               const SizedBox(
                 width: 15.0,
               ),
-              const Column(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "닉네임님,",
-                    style: TextStyle(
+                    "${userProvider.login?.nickname}님,",
+                    style: const TextStyle(
                       fontSize: 15.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Text("추억을 기록해보세요 ☺️"),
-                  SizedBox(
+                  const Text("추억을 기록해보세요 ☺️"),
+                  const SizedBox(
                     height: 10.0,
                   ),
                 ],

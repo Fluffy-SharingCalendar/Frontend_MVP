@@ -3,6 +3,8 @@ import 'package:fluffy_mvp/models/login_model.dart';
 import 'package:fluffy_mvp/services/login_service.dart';
 import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:fluffy_mvp/providers/user_provider.dart';
 
 class PhoneNumPage extends StatefulWidget {
   const PhoneNumPage({
@@ -26,6 +28,7 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     return Scaffold(
       body: Center(
         child: Column(
@@ -92,6 +95,8 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
 
                 bool loginSuccess = await LoginService.login(widget.login!);
                 if (loginSuccess) {
+                  userProvider.setLogin(widget.login!);
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
