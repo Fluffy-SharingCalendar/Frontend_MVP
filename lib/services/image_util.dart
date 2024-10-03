@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http_parser/http_parser.dart';
+import 'dart:io';
 
 class ImageUtil {
   static Future<http.MultipartFile> compressImageToMultipartFile(
@@ -8,7 +9,7 @@ class ImageUtil {
     const int maxSizeInBytes = 1 * 1000000;
     double compressionQuality = 1.0;
 
-    // 이미지 확장자와 파일 이름 설정
+    // 파일 확장자 확인
     String fileExtension = imagePath.split('.').last.toLowerCase();
     String mimeType;
     String filename;
@@ -35,15 +36,17 @@ class ImageUtil {
       ))!;
     }
 
+    // 파일 크기 확인
+    File file = File(imagePath);
+    print('원본 파일 크기: ${file.lengthSync()} bytes');
+
     List<int> imageData = await compressImage(1.0);
 
-    // 이미지 용량이 초과될 경우, 반복해서 압축
     while (imageData.length > maxSizeInBytes && compressionQuality > 0) {
       compressionQuality -= 0.1;
       imageData = await compressImage(compressionQuality);
     }
 
-    // 압축된 이미지 파일 반환
     return http.MultipartFile.fromBytes(
       fieldName,
       imageData,
@@ -52,7 +55,6 @@ class ImageUtil {
     );
   }
 
-  // 파일 확장자에 따라 압축 형식 반환
   static CompressFormat _getCompressFormat(String fileExtension) {
     switch (fileExtension) {
       case 'jpg':

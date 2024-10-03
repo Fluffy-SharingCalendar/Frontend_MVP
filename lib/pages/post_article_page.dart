@@ -1,10 +1,9 @@
 import 'package:fluffy_mvp/models/posting_model.dart';
+import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:fluffy_mvp/pages/sharing_memory_page.dart';
 import 'package:fluffy_mvp/services/post_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:fluffy_mvp/models/event_model.dart';
-import 'dart:typed_data';
 import 'dart:convert';
 
 class PostArticlePage extends StatefulWidget {
@@ -22,31 +21,25 @@ class PostArticlePage extends StatefulWidget {
 }
 
 class _PostArticlePageState extends State<PostArticlePage> {
-  List<Uint8List?> _imageBytesList = [];
+  List<PlatformFile?> _selectedFiles = []; // FilePicker의 PlatformFile 사용
   final TextEditingController _textController = TextEditingController();
 
   Future<void> _pickImages() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
       allowMultiple: true,
+      withReadStream: false, // bytes 사용을 위해 withReadStream을 false로 설정
     );
 
     if (result != null) {
       setState(() {
-        _imageBytesList = result.files.map((file) => file.bytes).toList();
+        _selectedFiles = result.files;
       });
     }
   }
 
   bool isValid() {
-    return _textController.text.isNotEmpty;
-  }
-
-  List<String> _convertToBase64(List<Uint8List?> imageBytesList) {
-    return imageBytesList
-        .where((bytes) => bytes != null)
-        .map((bytes) => base64Encode(bytes!))
-        .toList();
+    return _textController.text.isNotEmpty && _selectedFiles.isNotEmpty;
   }
 
   @override
@@ -67,7 +60,7 @@ class _PostArticlePageState extends State<PostArticlePage> {
             children: <Widget>[
               ImagePickerButton(onPickImages: _pickImages),
               const SizedBox(height: 20),
-              ImageList(imageBytesList: _imageBytesList),
+              ImageList(selectedFiles: _selectedFiles),
               const SizedBox(height: 20),
               Expanded(
                 child: TextField(
@@ -79,21 +72,22 @@ class _PostArticlePageState extends State<PostArticlePage> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SubmitButton(onSubmit: () {
-                    List<String> base64Images =
-                        _convertToBase64(_imageBytesList);
+                    if (!isValid()) return;
 
                     Posting posting = Posting(
                       eventId: widget.event!.eventId,
                       eventDate: widget.selectedDay ?? "Null",
                       content: _textController.text,
-                      files: base64Images,
+                      files: _selectedFiles
+                          .where((file) => file?.bytes != null) // bytes로 체크
+                          .map((file) =>
+                              base64Encode(file!.bytes!)) // base64 인코딩
+                          .toList(),
                     );
 
                     PostService.postArticle(posting);
@@ -147,35 +141,38 @@ class ImagePickerButton extends StatelessWidget {
 }
 
 class ImageList extends StatelessWidget {
-  final List<Uint8List?> imageBytesList;
+  final List<PlatformFile?> selectedFiles;
 
-  const ImageList({required this.imageBytesList, super.key});
+  const ImageList({required this.selectedFiles, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return imageBytesList.isEmpty
+    return selectedFiles.isEmpty
         ? Container()
         : SizedBox(
             height: 150.0,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: imageBytesList.length,
+              itemCount: selectedFiles.length,
               itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: imageBytesList[index] != null
-                      ? Container(
-                          width: 150.0,
-                          height: 150.0,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: MemoryImage(imageBytesList[index]!),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        )
-                      : const Text('이미지 로딩 에러'),
-                );
+                final file = selectedFiles[index];
+                if (file != null && file.bytes != null) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: Container(
+                      width: 150.0,
+                      height: 150.0,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: MemoryImage(file.bytes!), // 파일 미리보기
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return const Text('이미지 로딩 에러');
+                }
               },
             ),
           );
