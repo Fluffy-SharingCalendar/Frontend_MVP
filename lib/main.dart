@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:fluffy_mvp/pages/phone_num_page.dart';
 import 'package:fluffy_mvp/pages/post_article_page.dart';
 import 'package:fluffy_mvp/pages/sharing_memory_page.dart';
@@ -36,6 +37,12 @@ class MyApp extends StatelessWidget {
         '/post_article': (context) => const PostArticlePage(),
         '/sharing_memory': (context) => const SharingMemoryPage(),
       },
+      theme: ThemeData(
+          scaffoldBackgroundColor: AppColors.white,
+          fontFamily: 'Pretendard',
+          appBarTheme: const AppBarTheme(
+            backgroundColor: AppColors.white,
+          )),
     );
   }
 }

@@ -17,7 +17,6 @@ class PostService extends Auth {
     request.headers['Content-Type'] = 'multipart/form-data';
 
     var jsonPayload = jsonEncode({
-      'eventId': posting.eventId,
       'eventDate': posting.eventDate,
       'content': posting.content,
     });
@@ -49,6 +48,7 @@ class PostService extends Auth {
 
     try {
       var response = await request.send();
+      print(response.statusCode);
 
       if (response.statusCode == 204) {
         return true;
@@ -75,6 +75,7 @@ class PostService extends Auth {
 
       if (response.statusCode == 200) {
         var responseData = jsonDecode(utf8.decode(response.bodyBytes));
+        print(responseData);
         ArticleResponse articleResponse =
             ArticleResponse.fromJson(responseData);
         print(articleResponse.posts);
