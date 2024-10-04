@@ -47,6 +47,7 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
       postProvider.getInitialArticles(widget.event!.eventId);
     });
     _scrollController.jumpTo(0);
+    print("새로고침 완료");
   }
 
   @override

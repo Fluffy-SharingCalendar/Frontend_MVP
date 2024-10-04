@@ -155,7 +155,7 @@ class AuthorInfo extends StatelessWidget {
           ),
           isAuthor(userProvider.login!.nickname)
               ? MoreOptionsDialog(
-                  postId: article.postId,
+                  article: article,
                   onArticleChanged: onArticleChanged,
                 )
               : Container(),

@@ -14,7 +14,6 @@ class PostService extends Auth {
 
     request.headers['Authorization'] = Auth.jwtToken ?? "Null";
     request.headers['Content-Type'] = 'multipart/form-data';
-    print(Auth.jwtToken);
 
     var jsonPayload = jsonEncode({
       'eventDate': posting.eventDate,
@@ -48,7 +47,6 @@ class PostService extends Auth {
             }
 
             if (type == "jpeg") {
-              print("jpeg");
               request.files.add(http.MultipartFile.fromBytes(
                 'file',
                 imageBytes,
@@ -56,7 +54,6 @@ class PostService extends Auth {
                 contentType: MediaType('image', 'jpeg'),
               ));
             } else if (type == "png") {
-              print("png");
               request.files.add(http.MultipartFile.fromBytes(
                 'file',
                 imageBytes,
@@ -70,13 +67,11 @@ class PostService extends Auth {
         }
       }
     }
-    print("파일 추가 완료");
     try {
       var response = await request.send();
-      print(response.statusCode);
 
       String responseBody = await response.stream.bytesToString();
-      print("Response Body: $responseBody");
+
       if (response.statusCode == 204) {
         return true;
       } else {
@@ -133,6 +128,83 @@ class PostService extends Auth {
       }
     } catch (e) {
       throw Exception(e);
+    }
+  }
+
+  // 게시글 수정
+  static Future<bool> modifyArticle(
+      String content, int postId, List<String>? files) async {
+    final String url = "$domainUrl/api/posts/$postId";
+    var request = http.MultipartRequest('PATCH', Uri.parse(url));
+
+    request.headers['Authorization'] = Auth.jwtToken ?? "Null";
+    request.headers['Content-Type'] = 'multipart/form-data';
+
+    var jsonPayload = jsonEncode({
+      'content': content,
+    });
+
+    var jsonPart = http.MultipartFile.fromString(
+      'post',
+      jsonPayload,
+      contentType: MediaType('application', 'json'),
+    );
+    request.files.add(jsonPart);
+
+    if (files != null && files.isNotEmpty) {
+      for (String? base64Image in files) {
+        if (base64Image != null && base64Image.isNotEmpty) {
+          try {
+            String type = "";
+            Uint8List imageBytes = base64Decode(base64Image);
+            if (imageBytes.length >= 4) {
+              if (imageBytes[0] == 0x89 &&
+                  imageBytes[1] == 0x50 &&
+                  imageBytes[2] == 0x4E &&
+                  imageBytes[3] == 0x47) {
+                type = "png";
+              } else if (imageBytes[0] == 0xFF &&
+                  imageBytes[1] == 0xD8 &&
+                  imageBytes[2] == 0xFF) {
+                type = "jpeg";
+              }
+            }
+
+            if (type == "jpeg") {
+              request.files.add(http.MultipartFile.fromBytes(
+                'file',
+                imageBytes,
+                filename: 'image.jpeg',
+                contentType: MediaType('image', 'jpeg'),
+              ));
+            } else if (type == "png") {
+              request.files.add(http.MultipartFile.fromBytes(
+                'file',
+                imageBytes,
+                filename: 'image.png',
+                contentType: MediaType('image', 'png'),
+              ));
+            }
+          } catch (e) {
+            throw Exception("이미지 처리 중 오류 발생: $e");
+          }
+        }
+      }
+    }
+    try {
+      var response = await request.send();
+      print(response.statusCode);
+
+      String responseBody = await response.stream.bytesToString();
+      print("Response Body: $responseBody");
+      if (response.statusCode == 204) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print("error : $e");
+      throw Exception("게시글 수정 중 에러 발생: $e");
     }
   }
 }
