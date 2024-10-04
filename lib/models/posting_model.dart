@@ -12,11 +12,16 @@ class Posting {
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    final Map<String, dynamic> data = {
       'eventId': eventId,
       'eventDate': eventDate,
       'content': content,
-      'files': files,
     };
+
+    if (files != null && files!.isNotEmpty) {
+      data['files'] = files;
+    }
+
+    return data;
   }
 }

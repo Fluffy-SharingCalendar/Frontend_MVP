@@ -1,29 +1,29 @@
 import 'package:fluffy_mvp/models/color_model.dart';
-import 'package:fluffy_mvp/models/posting_model.dart';
-import 'package:fluffy_mvp/models/event_model.dart';
+import 'package:fluffy_mvp/models/article_model.dart';
 import 'package:fluffy_mvp/services/post_service.dart';
 import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class PostArticlePage extends StatefulWidget {
-  const PostArticlePage({
+class ModifyArticlePage extends StatefulWidget {
+  const ModifyArticlePage({
     super.key,
-    this.event,
-    this.selectedDay,
+    this.article,
+    this.onArticleChanged,
   });
 
-  final Event? event;
-  final String? selectedDay;
+  final Article? article;
+  final VoidCallback? onArticleChanged;
 
   @override
-  State<PostArticlePage> createState() => _PostArticlePageState();
+  State<ModifyArticlePage> createState() => _ModifyArticlePageState();
 }
 
-class _PostArticlePageState extends State<PostArticlePage> {
-  List<PlatformFile?> _selectedFiles = []; // FilePicker의 PlatformFile 사용
-  final TextEditingController _textController = TextEditingController();
+class _ModifyArticlePageState extends State<ModifyArticlePage> {
+  List<PlatformFile?> _selectedFiles = [];
+  TextEditingController _textController = TextEditingController();
 
   Future<void> _pickImages() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -41,6 +41,38 @@ class _PostArticlePageState extends State<PostArticlePage> {
 
   bool isValid() {
     return _textController.text.isNotEmpty;
+  }
+
+  Future<void> _convertUrlsToPlatformFiles(List<String> urls) async {
+    List<PlatformFile> files = [];
+
+    for (String url in urls) {
+      try {
+        http.Response response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          files.add(PlatformFile(
+            name: url.split('/').last,
+            size: response.bodyBytes.length,
+            bytes: response.bodyBytes,
+          ));
+        } else {
+          print("이미지를 다운로드할 수 없습니다: $url");
+        }
+      } catch (e) {
+        print("이미지 다운로드 중 오류 발생: $e");
+      }
+    }
+
+    setState(() {
+      _selectedFiles.addAll(files);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController(text: widget.article!.content);
+    _convertUrlsToPlatformFiles(widget.article!.urls);
   }
 
   @override
@@ -92,17 +124,14 @@ class _PostArticlePageState extends State<PostArticlePage> {
                   SubmitButton(onSubmit: () async {
                     if (!isValid()) await alert(context, "작성 실패", "글을 입력해주세요.");
 
-                    Posting posting = Posting(
-                      eventId: widget.event!.eventId,
-                      eventDate: widget.selectedDay ?? "Null",
-                      content: _textController.text,
-                      files: _selectedFiles
+                    bool isSuccess = await PostService.modifyArticle(
+                      _textController.text,
+                      widget.article!.postId,
+                      _selectedFiles
                           .where((file) => file?.bytes != null)
                           .map((file) => base64Encode(file!.bytes!))
                           .toList(),
                     );
-
-                    bool isSuccess = await PostService.postArticle(posting);
 
                     if (isSuccess) {
                       Navigator.pop(context, true);
@@ -176,7 +205,7 @@ class ImageList extends StatelessWidget {
                       height: 150.0,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: MemoryImage(file.bytes!),
+                          image: MemoryImage(file.bytes!), // 바이트 데이터를 이미지로
                           fit: BoxFit.cover,
                         ),
                       ),

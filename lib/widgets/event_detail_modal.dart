@@ -40,7 +40,7 @@ class _EventDetailModalState extends State<EventDetailModal> {
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(18.0),
-        child: isClickedDetail
+        child: isClickedDetail && selectedEvent != null
             ? EventDetailView(
                 selectedDay: widget.selectedDay,
                 event: selectedEvent!,
@@ -50,7 +50,8 @@ class _EventDetailModalState extends State<EventDetailModal> {
                 selectedDay: widget.selectedDay,
                 events: widget.events,
                 onClose: widget.onClose,
-                onTapDetail: (event) => toggleClicked(true, event),
+                onTapDetail: (event) =>
+                    toggleClicked(true, event), // 이벤트 클릭 시 업데이트
               ),
       ),
     );

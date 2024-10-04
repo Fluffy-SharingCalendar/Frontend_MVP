@@ -40,6 +40,7 @@ dependencies:
   flutter_image_compress: ^2.3.0
   http_parser: ^4.0.2
   intl: ^0.19.0
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,20 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Black.ttf
+        - asset: assets/fonts/Pretendard-Bold.ttf
+        - asset: assets/fonts/Pretendard-ExtraBold.ttf
+        - asset: assets/fonts/Pretendard-ExtraLight.ttf
+        - asset: assets/fonts/Pretendard-Light.ttf
+        - asset: assets/fonts/Pretendard-Medium.ttf
+        - asset: assets/fonts/Pretendard-Regular.ttf
+        - asset: assets/fonts/Pretendard-SemiBold.ttf
+        - asset: assets/fonts/Pretendard-Thin.ttf
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

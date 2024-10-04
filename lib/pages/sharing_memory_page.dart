@@ -1,9 +1,14 @@
+import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:fluffy_mvp/pages/post_article_page.dart';
+import 'package:fluffy_mvp/providers/post_provider.dart';
 import 'package:fluffy_mvp/widgets/comment.dart';
+import 'package:fluffy_mvp/widgets/gradation_profile_triangle.dart';
 import 'package:flutter/material.dart';
-import 'package:fluffy_mvp/widgets/article.dart';
+import 'package:fluffy_mvp/widgets/article_widget.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
+import 'package:provider/provider.dart';
+import 'package:fluffy_mvp/providers/user_provider.dart';
 
 class SharingMemoryPage extends StatefulWidget {
   const SharingMemoryPage({
@@ -20,6 +25,11 @@ class SharingMemoryPage extends StatefulWidget {
 }
 
 class _SharingMemoryPageState extends State<SharingMemoryPage> {
+  final ScrollController _scrollController = ScrollController(
+    keepScrollOffset: true,
+  );
+  int page = 0;
+
   List<String> profileImageList = ProfileImageList.profileImages;
   bool isCommentPressed = false;
 
@@ -30,26 +40,59 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
     });
   }
 
+  void reload() {
+    setState(() {
+      // 새로고침 로직
+      final postProvider = Provider.of<PostProvider>(context, listen: false);
+      postProvider.getInitialArticles(widget.event!.eventId);
+    });
+    _scrollController.jumpTo(0);
+    print("새로고침 완료");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
+    postProvider.getInitialArticles(widget.event!.eventId);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("추억 공유하기"),
+        title: Image.asset(
+          'assets/images/logo.png',
+          height: 40,
+          width: 100,
+        ),
       ),
+      // 글 작성 버튼
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          bool? shouldRefresh = await Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => PostArticlePage(
-                      event: widget.event,
-                      selectedDay: widget.selectedDay,
-                    )),
+              builder: (context) => PostArticlePage(
+                event: widget.event,
+                selectedDay: widget.selectedDay,
+              ),
+            ),
           );
+          if (shouldRefresh == true) {
+            reload();
+          }
         },
-        backgroundColor: const Color.fromARGB(255, 213, 125, 229),
+        backgroundColor: AppColors.brown,
         child: const Icon(
           Icons.add,
           color: Colors.white,
@@ -62,18 +105,31 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
           ProfileSection(
             screenSize: screenSize,
             profileImageList: profileImageList,
+            selectedDay: widget.selectedDay!,
+            eventTitle: widget.event!.title,
           ),
           // 글 섹션
-          SizedBox(
-            width: screenSize.width * 0.4,
-            height: screenSize.height,
-            child: Expanded(
+          Expanded(
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (!postProvider.loading &&
+                    scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent) {
+                  page++;
+                  postProvider.getMoreArticles(widget.event!.eventId, page);
+                  return true;
+                }
+                return false;
+              },
               child: ListView.builder(
-                itemCount: 5,
+                controller: _scrollController,
+                itemCount: postProvider.articles.length,
                 itemBuilder: (context, index) {
-                  return Article(
+                  return ArticleWidget(
                     height: screenSize.width * 0.4,
                     onCommentPressed: () => _toggleComments(true),
+                    article: postProvider.articles[index],
+                    onArticleChanged: reload,
                   );
                 },
               ),
@@ -102,15 +158,20 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
 class ProfileSection extends StatelessWidget {
   final Size screenSize;
   final List<String> profileImageList;
+  final String selectedDay;
+  final String eventTitle;
 
   const ProfileSection({
     Key? key,
     required this.screenSize,
     required this.profileImageList,
+    required this.selectedDay,
+    required this.eventTitle,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return IntrinsicHeight(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
@@ -132,37 +193,28 @@ class ProfileSection extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(profileImageList[0]),
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Colors.black45,
-                    width: 1.5,
-                  ),
-                ),
+              GradationBorderProfileTriangle(
+                profileImage:
+                    profileImageList[userProvider.login!.profileImageIndex],
+                size: 100.0,
               ),
               const SizedBox(
                 width: 15.0,
               ),
-              const Column(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "닉네임님,",
-                    style: TextStyle(
+                    "${userProvider.login?.nickname}님,",
+                    style: const TextStyle(
                       fontSize: 15.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Text("추억을 기록해보세요 ☺️"),
-                  SizedBox(
+                  Text("$selectedDay의 $eventTitle에서 있었던"),
+                  const Text("추억을 기록해보세요 ☺️"),
+                  const SizedBox(
                     height: 10.0,
                   ),
                 ],
@@ -186,6 +238,7 @@ class CommentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController textEditingController = TextEditingController();
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 20.0,
@@ -233,7 +286,37 @@ class CommentSection extends StatelessWidget {
               color: Colors.black38,
             ),
           ),
-          // 여기에 댓글 목록을 추가할 수 있습니다.
+          const SizedBox(
+            height: 10.0,
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: TextField(
+              style: const TextStyle(
+                fontSize: 12.0,
+              ),
+              controller: textEditingController,
+              decoration: const InputDecoration(
+                hintText: "댓글을 입력해주세요.",
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: 5,

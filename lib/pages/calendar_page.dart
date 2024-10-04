@@ -70,14 +70,17 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     _getEvents();
-    print(_events);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("FLUFFY"),
+        title: Image.asset(
+          'assets/images/logo.png',
+          height: 40,
+          width: 100,
+        ),
       ),
       body: Stack(
         children: [

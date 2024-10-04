@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -68,7 +69,7 @@ class _ProfileImageState extends State<ProfileImage> {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 251, 239, 252),
+                color: AppColors.pink,
                 borderRadius: BorderRadius.circular(50),
               ),
               child: const Icon(

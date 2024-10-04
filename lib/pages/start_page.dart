@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:fluffy_mvp/models/login_model.dart';
 import 'package:fluffy_mvp/services/login_service.dart';
 import 'package:fluffy_mvp/widgets/profile_image.dart';
@@ -44,12 +45,10 @@ class _StartPageState extends State<StartPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              "Fluffy",
-              style: TextStyle(
-                fontSize: 30.0,
-                fontWeight: FontWeight.w600,
-              ),
+            Image.asset(
+              'assets/images/logo.png',
+              height: 80,
+              width: 200,
             ),
             const SizedBox(
               height: 10.0,
@@ -123,8 +122,9 @@ class _StartPageState extends State<StartPage> {
               child: const Text(
                 "이 닉네임으로 할래요 🙋🏻‍♀️",
                 style: TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.w300,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.brown,
                 ),
               ),
             )

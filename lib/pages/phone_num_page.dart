@@ -1,8 +1,11 @@
+import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:fluffy_mvp/pages/calendar_page.dart';
 import 'package:fluffy_mvp/models/login_model.dart';
 import 'package:fluffy_mvp/services/login_service.dart';
 import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:fluffy_mvp/providers/user_provider.dart';
 
 class PhoneNumPage extends StatefulWidget {
   const PhoneNumPage({
@@ -26,18 +29,17 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              "Fluffy",
-              style: TextStyle(
-                fontSize: 30.0,
-                fontWeight: FontWeight.w600,
-              ),
+            Image.asset(
+              'assets/images/logo.png',
+              height: 80,
+              width: 200,
             ),
             const SizedBox(
               height: 10.0,
@@ -80,7 +82,7 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
             const Text(
               "수요조사 기간이 끝난 후 전화전호 정보는 모두 폐기됩니다.",
               style: TextStyle(
-                color: Colors.indigoAccent,
+                color: AppColors.accentGreen,
               ),
             ),
             const SizedBox(
@@ -92,6 +94,8 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
 
                 bool loginSuccess = await LoginService.login(widget.login!);
                 if (loginSuccess) {
+                  userProvider.setLogin(widget.login!);
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -105,8 +109,9 @@ class _PhoneNumPageState extends State<PhoneNumPage> {
               child: const Text(
                 "확인했습니다! 🙆🏻‍♀️",
                 style: TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.w300,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.brown,
                 ),
               ),
             )
