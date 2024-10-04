@@ -1,6 +1,6 @@
+import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:fluffy_mvp/models/posting_model.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
-import 'package:fluffy_mvp/pages/sharing_memory_page.dart';
 import 'package:fluffy_mvp/services/post_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -28,7 +28,7 @@ class _PostArticlePageState extends State<PostArticlePage> {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
       allowMultiple: true,
-      withReadStream: false, // bytes 사용을 위해 withReadStream을 false로 설정
+      withReadStream: false,
     );
 
     if (result != null) {
@@ -39,7 +39,7 @@ class _PostArticlePageState extends State<PostArticlePage> {
   }
 
   bool isValid() {
-    return _textController.text.isNotEmpty && _selectedFiles.isNotEmpty;
+    return _textController.text.isNotEmpty;
   }
 
   @override
@@ -48,7 +48,11 @@ class _PostArticlePageState extends State<PostArticlePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("글 작성"),
+        title: Image.asset(
+          'assets/images/logo.png',
+          height: 40,
+          width: 100,
+        ),
       ),
       body: Center(
         child: Container(
@@ -61,7 +65,15 @@ class _PostArticlePageState extends State<PostArticlePage> {
               ImagePickerButton(onPickImages: _pickImages),
               const SizedBox(height: 20),
               ImageList(selectedFiles: _selectedFiles),
-              const SizedBox(height: 20),
+              const Row(
+                children: [
+                  Text("이미지 업로드는 '.png', '.jpg', 'jpeg'만 가능합니다.",
+                      style: TextStyle(
+                        color: AppColors.accentGreen,
+                      )),
+                ],
+              ),
+              const SizedBox(height: 10),
               Expanded(
                 child: TextField(
                   controller: _textController,
@@ -76,7 +88,7 @@ class _PostArticlePageState extends State<PostArticlePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  SubmitButton(onSubmit: () {
+                  SubmitButton(onSubmit: () async {
                     if (!isValid()) return;
 
                     Posting posting = Posting(
@@ -84,20 +96,16 @@ class _PostArticlePageState extends State<PostArticlePage> {
                       eventDate: widget.selectedDay ?? "Null",
                       content: _textController.text,
                       files: _selectedFiles
-                          .where((file) => file?.bytes != null) // bytes로 체크
-                          .map((file) =>
-                              base64Encode(file!.bytes!)) // base64 인코딩
+                          .where((file) => file?.bytes != null)
+                          .map((file) => base64Encode(file!.bytes!))
                           .toList(),
                     );
 
-                    PostService.postArticle(posting);
+                    bool isSuccess = await PostService.postArticle(posting);
 
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SharingMemoryPage(),
-                      ),
-                    );
+                    if (isSuccess) {
+                      Navigator.pop(context, true);
+                    }
                   }),
                 ],
               )
@@ -119,18 +127,21 @@ class ImagePickerButton extends StatelessWidget {
     return Row(
       children: [
         ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all(AppColors.brown),
+          ),
           onPressed: onPickImages,
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.image_search_outlined,
-                color: Colors.black54,
+                color: Colors.white,
               ),
               SizedBox(width: 10.0),
               Text(
                 "이미지 불러오기",
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(color: Colors.white),
               ),
             ],
           ),
@@ -188,17 +199,20 @@ class SubmitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onSubmit,
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.all(AppColors.brown),
+      ),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             Icons.add,
-            color: Colors.black54,
+            color: Colors.white,
           ),
           SizedBox(width: 10.0),
           Text(
             "작성 완료",
-            style: TextStyle(color: Colors.black54),
+            style: TextStyle(color: Colors.white),
           ),
         ],
       ),

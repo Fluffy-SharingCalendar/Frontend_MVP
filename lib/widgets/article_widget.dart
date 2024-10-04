@@ -1,6 +1,10 @@
 import 'package:fluffy_mvp/models/article_model.dart';
+import 'package:fluffy_mvp/widgets/article_dialog.dart';
+import 'package:fluffy_mvp/widgets/gradation_profile_circle.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
+import 'package:provider/provider.dart';
+import 'package:fluffy_mvp/providers/user_provider.dart';
 
 class ArticleWidget extends StatefulWidget {
   const ArticleWidget({
@@ -81,6 +85,13 @@ class _ArticleWidgetState extends State<ArticleWidget> {
             onCommentPressed: widget.onCommentPressed,
             commentCount: widget.article.commentCnt,
           ),
+
+          Container(
+            height: 1.0,
+            decoration: const BoxDecoration(
+              color: Colors.black12,
+            ),
+          ),
         ],
       ),
     );
@@ -93,6 +104,10 @@ class AuthorInfo extends StatelessWidget {
   final String authorProfileImage;
   final String eventDate;
 
+  bool isAuthor(String myNickname) {
+    return authorNickname == myNickname;
+  }
+
   const AuthorInfo({
     Key? key,
     required this.authorNickname,
@@ -102,55 +117,45 @@ class AuthorInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: 45,
-            height: 45,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(authorProfileImage),
-                fit: BoxFit.cover,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 1,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(50),
-              border: Border.all(
-                color: Colors.black45,
-                width: 1.5,
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 10.0,
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(
-                authorNickname,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12.0,
-                ),
+              GradationProfileCircle(
+                authorProfileImage: authorProfileImage,
+                size: 50.0,
               ),
-              Text(
-                eventDate,
-                style: const TextStyle(
-                  fontSize: 10.0,
-                ),
+              const SizedBox(
+                width: 10.0,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    authorNickname,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                  Text(
+                    eventDate,
+                    style: const TextStyle(
+                      fontSize: 10.0,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
+          isAuthor(userProvider.login!.nickname)
+              ? const MoreOptionsDialog()
+              : Container(),
         ],
       ),
     );
@@ -190,11 +195,6 @@ class ArticleWidgetImageSlider extends StatelessWidget {
                       image: NetworkImage(
                         imageList[currentIndex],
                       ),
-                      onError: (error, stackTrace) {
-                        print("image : ${imageList[currentIndex]}");
-                        print(error);
-                        print(stackTrace);
-                      },
                       fit: BoxFit.cover,
                     ),
                   ),

@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/widgets/gradation_profile_circle.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
 
@@ -23,28 +24,9 @@ class _CommentState extends State<Comment> {
           // 댓글 작성자 정보
           Row(
             children: [
-              Container(
-                width: 35,
-                height: 35,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(profileImageList[1]),
-                    fit: BoxFit.cover,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 1,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                  borderRadius: BorderRadius.circular(50),
-                  border: Border.all(
-                    color: Colors.black45,
-                    width: 1.5,
-                  ),
-                ),
+              GradationProfileCircle(
+                authorProfileImage: profileImageList[0],
+                size: 35,
               ),
               const SizedBox(
                 width: 10.0,
@@ -57,13 +39,13 @@ class _CommentState extends State<Comment> {
                     "작성자 닉네임",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 10.0,
+                      fontSize: 12.0,
                     ),
                   ),
                   Text(
                     "작성날짜",
                     style: TextStyle(
-                      fontSize: 8.0,
+                      fontSize: 10.0,
                     ),
                   ),
                 ],
@@ -72,7 +54,7 @@ class _CommentState extends State<Comment> {
           ),
           // 댓글 영역
           const SizedBox(
-            height: 5.0,
+            height: 10.0,
           ),
           const Text(
             "댓글 내용",

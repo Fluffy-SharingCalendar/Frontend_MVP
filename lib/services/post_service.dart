@@ -9,12 +9,12 @@ import 'package:http/http.dart' as http;
 class PostService extends Auth {
   // 게시글 등록
   static Future<bool> postArticle(Posting posting) async {
-    final String url = "$domainUrl/api/post/${posting.eventId}";
-
+    final String url = "$domainUrl/api/posts/${posting.eventId}";
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
-    request.headers['Authorization'] = Auth.jwtToken ?? 'Null';
+    request.headers['Authorization'] = Auth.jwtToken ?? '';
     request.headers['Content-Type'] = 'multipart/form-data';
+    print(Auth.jwtToken);
 
     var jsonPayload = jsonEncode({
       'eventDate': posting.eventDate,
@@ -29,33 +29,61 @@ class PostService extends Auth {
     request.files.add(jsonPart);
 
     if (posting.files != null && posting.files!.isNotEmpty) {
-      for (String base64Image in posting.files!) {
-        if (base64Image.isNotEmpty) {
+      for (String? base64Image in posting.files!) {
+        if (base64Image != null && base64Image.isNotEmpty) {
           try {
+            String type = "";
             Uint8List imageBytes = base64Decode(base64Image);
-            request.files.add(http.MultipartFile.fromBytes(
-              'file',
-              imageBytes,
-              filename: 'image.jpeg',
-              contentType: MediaType('image', 'jpeg'),
-            ));
+            if (imageBytes.length >= 4) {
+              if (imageBytes[0] == 0x89 &&
+                  imageBytes[1] == 0x50 &&
+                  imageBytes[2] == 0x4E &&
+                  imageBytes[3] == 0x47) {
+                type = "png";
+              } else if (imageBytes[0] == 0xFF &&
+                  imageBytes[1] == 0xD8 &&
+                  imageBytes[2] == 0xFF) {
+                type = "jpeg";
+              }
+            }
+
+            if (type == "jpeg") {
+              print("jpeg");
+              request.files.add(http.MultipartFile.fromBytes(
+                'file',
+                imageBytes,
+                filename: 'image.jpeg',
+                contentType: MediaType('image', 'jpeg'),
+              ));
+            } else if (type == "png") {
+              print("png");
+              request.files.add(http.MultipartFile.fromBytes(
+                'file',
+                imageBytes,
+                filename: 'image.png',
+                contentType: MediaType('image', 'png'),
+              ));
+            }
           } catch (e) {
-            throw Exception(e);
+            throw Exception("이미지 처리 중 오류 발생: $e");
           }
         }
       }
     }
-
+    print("파일 추가 완료");
     try {
       var response = await request.send();
       print(response.statusCode);
 
+      String responseBody = await response.stream.bytesToString();
+      print("Response Body: $responseBody");
       if (response.statusCode == 204) {
         return true;
       } else {
         return false;
       }
     } catch (e) {
+      print("error : $e");
       throw Exception("게시글 작성 중 에러 발생: $e");
     }
   }
@@ -75,10 +103,8 @@ class PostService extends Auth {
 
       if (response.statusCode == 200) {
         var responseData = jsonDecode(utf8.decode(response.bodyBytes));
-        print(responseData);
         ArticleResponse articleResponse =
             ArticleResponse.fromJson(responseData);
-        print(articleResponse.posts);
         return articleResponse.posts;
       } else {
         throw Exception('일정 상세 조회 실패 : ${response.statusCode}');
