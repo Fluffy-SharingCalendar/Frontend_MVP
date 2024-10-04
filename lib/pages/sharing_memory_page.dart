@@ -1,8 +1,9 @@
 import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:fluffy_mvp/pages/post_article_page.dart';
+import 'package:fluffy_mvp/providers/comment_provider.dart';
 import 'package:fluffy_mvp/providers/post_provider.dart';
-import 'package:fluffy_mvp/widgets/comment.dart';
+import 'package:fluffy_mvp/widgets/comment_widget.dart';
 import 'package:fluffy_mvp/widgets/gradation_profile_triangle.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/widgets/article_widget.dart';
@@ -29,25 +30,23 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
     keepScrollOffset: true,
   );
   int page = 0;
-
-  List<String> profileImageList = ProfileImageList.profileImages;
+  int? selectedPostId; // 현재 댓글을 열고 있는 postId
   bool isCommentPressed = false;
 
   // 댓글 창 열기/닫기
-  void _toggleComments(bool isOpened) {
+  void _toggleComments(bool isOpened, [int? postId]) {
     setState(() {
       isCommentPressed = isOpened;
+      selectedPostId = postId; // 선택된 postId를 저장
     });
   }
 
   void reload() {
     setState(() {
-      // 새로고침 로직
       final postProvider = Provider.of<PostProvider>(context, listen: false);
       postProvider.getInitialArticles(widget.event!.eventId);
     });
     _scrollController.jumpTo(0);
-    print("새로고침 완료");
   }
 
   @override
@@ -104,7 +103,7 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
           // 프로필 섹션
           ProfileSection(
             screenSize: screenSize,
-            profileImageList: profileImageList,
+            profileImageList: ProfileImageList.profileImages,
             selectedDay: widget.selectedDay!,
             eventTitle: widget.event!.title,
           ),
@@ -127,7 +126,8 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
                 itemBuilder: (context, index) {
                   return ArticleWidget(
                     height: screenSize.width * 0.4,
-                    onCommentPressed: () => _toggleComments(true),
+                    onCommentPressed: (postId) =>
+                        _toggleComments(true, postId), // postId 전달
                     article: postProvider.articles[index],
                     onArticleChanged: reload,
                   );
@@ -146,7 +146,10 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
             width: screenSize.width * 0.3,
             height: screenSize.height,
             child: isCommentPressed
-                ? CommentSection(onClosePressed: () => _toggleComments(false))
+                ? CommentSection(
+                    onClosePressed: () => _toggleComments(false),
+                    postId: selectedPostId!, // 선택된 postId 전달
+                  )
                 : Container(),
           ),
         ],
@@ -227,18 +230,36 @@ class ProfileSection extends StatelessWidget {
   }
 }
 
-// 댓글 섹션 위젯
-class CommentSection extends StatelessWidget {
+// 댓글 섹션
+class CommentSection extends StatefulWidget {
   final VoidCallback onClosePressed;
+  final int postId;
 
   const CommentSection({
     Key? key,
     required this.onClosePressed,
+    required this.postId,
   }) : super(key: key);
 
   @override
+  _CommentSectionState createState() => _CommentSectionState();
+}
+
+class _CommentSectionState extends State<CommentSection> {
+  final TextEditingController _textEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final commentProvider =
+        Provider.of<CommentProvider>(context, listen: false);
+    commentProvider.getComments(widget.postId);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController textEditingController = TextEditingController();
+    final commentProvider = Provider.of<CommentProvider>(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 20.0,
@@ -271,7 +292,7 @@ class CommentSection extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: onClosePressed,
+                onPressed: widget.onClosePressed,
                 icon: const Icon(
                   Icons.close,
                   color: Colors.black45,
@@ -292,22 +313,14 @@ class CommentSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(10.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
             child: TextField(
               style: const TextStyle(
                 fontSize: 12.0,
               ),
-              controller: textEditingController,
+              controller: _textEditingController,
               decoration: const InputDecoration(
                 hintText: "댓글을 입력해주세요.",
                 border: InputBorder.none,
@@ -319,9 +332,11 @@ class CommentSection extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: 5,
+              itemCount: commentProvider.comments.length,
               itemBuilder: (context, index) {
-                return const Comment();
+                return CommentWidget(
+                  comment: commentProvider.comments[index],
+                );
               },
             ),
           ),

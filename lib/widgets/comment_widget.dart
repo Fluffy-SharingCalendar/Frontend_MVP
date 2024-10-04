@@ -1,17 +1,21 @@
+import 'package:fluffy_mvp/models/comment_model.dart';
 import 'package:fluffy_mvp/widgets/gradation_profile_circle.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
 
-class Comment extends StatefulWidget {
-  const Comment({
+class CommentWidget extends StatefulWidget {
+  const CommentWidget({
     super.key,
+    required this.comment,
   });
 
+  final Comment comment;
+
   @override
-  _CommentState createState() => _CommentState();
+  _CommentWidgetState createState() => _CommentWidgetState();
 }
 
-class _CommentState extends State<Comment> {
+class _CommentWidgetState extends State<CommentWidget> {
   List<String> profileImageList = ProfileImageList.profileImages;
 
   @override
@@ -25,26 +29,27 @@ class _CommentState extends State<Comment> {
           Row(
             children: [
               GradationProfileCircle(
-                authorProfileImage: profileImageList[0],
+                authorProfileImage:
+                    profileImageList[widget.comment.authorProfileNo],
                 size: 35,
               ),
               const SizedBox(
                 width: 10.0,
               ),
-              const Column(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "작성자 닉네임",
-                    style: TextStyle(
+                    widget.comment.authorNickname,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 12.0,
                     ),
                   ),
                   Text(
-                    "작성날짜",
-                    style: TextStyle(
+                    widget.comment.createdAt,
+                    style: const TextStyle(
                       fontSize: 10.0,
                     ),
                   ),
@@ -56,9 +61,9 @@ class _CommentState extends State<Comment> {
           const SizedBox(
             height: 10.0,
           ),
-          const Text(
-            "댓글 내용",
-            style: TextStyle(
+          Text(
+            widget.comment.content,
+            style: const TextStyle(
               fontSize: 12.0,
             ),
           ),

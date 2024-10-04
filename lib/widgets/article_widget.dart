@@ -16,7 +16,7 @@ class ArticleWidget extends StatefulWidget {
   });
 
   final double height;
-  final VoidCallback onCommentPressed;
+  final Function(int) onCommentPressed; // postId를 함께 전달하는 콜백
   final Article article;
   final VoidCallback onArticleChanged;
 
@@ -82,7 +82,8 @@ class _ArticleWidgetState extends State<ArticleWidget> {
 
           // 댓글 및 좋아요 상호작용 버튼 위젯
           ArticleWidgetInteractions(
-            onCommentPressed: widget.onCommentPressed,
+            onCommentPressed: () =>
+                widget.onCommentPressed(widget.article.postId), // postId 전달
             commentCount: widget.article.commentCnt,
           ),
 
