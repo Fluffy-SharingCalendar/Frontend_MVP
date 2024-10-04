@@ -12,7 +12,7 @@ class PostService extends Auth {
     final String url = "$domainUrl/api/posts/${posting.eventId}";
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
-    request.headers['Authorization'] = Auth.jwtToken ?? '';
+    request.headers['Authorization'] = Auth.jwtToken ?? "Null";
     request.headers['Content-Type'] = 'multipart/form-data';
     print(Auth.jwtToken);
 
@@ -107,7 +107,29 @@ class PostService extends Auth {
             ArticleResponse.fromJson(responseData);
         return articleResponse.posts;
       } else {
-        throw Exception('일정 상세 조회 실패 : ${response.statusCode}');
+        throw Exception('게시글 전체 조회 실패 : ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  // 게시글 삭제
+  static Future<bool> deleteArticle(int postId) async {
+    final String url = "$domainUrl/api/posts/$postId";
+
+    try {
+      var response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          "Authorization": Auth.jwtToken ?? "Null",
+        },
+      );
+
+      if (response.statusCode == 204) {
+        return true;
+      } else {
+        return false;
       }
     } catch (e) {
       throw Exception(e);

@@ -12,11 +12,13 @@ class ArticleWidget extends StatefulWidget {
     required this.height,
     required this.onCommentPressed,
     required this.article,
+    required this.onArticleChanged,
   });
 
   final double height;
   final VoidCallback onCommentPressed;
   final Article article;
+  final VoidCallback onArticleChanged;
 
   @override
   _ArticleWidgetState createState() => _ArticleWidgetState();
@@ -50,10 +52,8 @@ class _ArticleWidgetState extends State<ArticleWidget> {
         children: [
           // 작성자 정보 위젯
           AuthorInfo(
-            authorNickname: widget.article.authorNickname,
-            authorProfileImage:
-                profileImageList[widget.article.authorProfileImageNo],
-            eventDate: widget.article.eventDate,
+            article: widget.article,
+            onArticleChanged: widget.onArticleChanged,
           ),
 
           // 이미지 슬라이더 위젯
@@ -100,24 +100,23 @@ class _ArticleWidgetState extends State<ArticleWidget> {
 
 // 작성자 정보 위젯
 class AuthorInfo extends StatelessWidget {
-  final String authorNickname;
-  final String authorProfileImage;
-  final String eventDate;
+  final Article article;
+  final VoidCallback onArticleChanged;
 
   bool isAuthor(String myNickname) {
-    return authorNickname == myNickname;
+    return article.authorNickname == myNickname;
   }
 
   const AuthorInfo({
     Key? key,
-    required this.authorNickname,
-    required this.authorProfileImage,
-    required this.eventDate,
+    required this.article,
+    required this.onArticleChanged,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    List<String> profileImageList = ProfileImageList.profileImages;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
       child: Row(
@@ -126,7 +125,8 @@ class AuthorInfo extends StatelessWidget {
           Row(
             children: [
               GradationProfileCircle(
-                authorProfileImage: authorProfileImage,
+                authorProfileImage:
+                    profileImageList[article.authorProfileImageNo],
                 size: 50.0,
               ),
               const SizedBox(
@@ -137,14 +137,14 @@ class AuthorInfo extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    authorNickname,
+                    article.authorNickname,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14.0,
                     ),
                   ),
                   Text(
-                    eventDate,
+                    article.eventDate,
                     style: const TextStyle(
                       fontSize: 10.0,
                     ),
@@ -154,7 +154,10 @@ class AuthorInfo extends StatelessWidget {
             ],
           ),
           isAuthor(userProvider.login!.nickname)
-              ? const MoreOptionsDialog()
+              ? MoreOptionsDialog(
+                  postId: article.postId,
+                  onArticleChanged: onArticleChanged,
+                )
               : Container(),
         ],
       ),

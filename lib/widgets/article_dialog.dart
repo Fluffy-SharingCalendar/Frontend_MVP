@@ -1,8 +1,13 @@
 import 'package:fluffy_mvp/models/color_model.dart';
+import 'package:fluffy_mvp/services/post_service.dart';
+import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:flutter/material.dart';
 
 class MoreOptionsDialog extends StatelessWidget {
-  const MoreOptionsDialog({super.key});
+  const MoreOptionsDialog({super.key, required this.postId, required this.onArticleChanged,});
+
+  final int postId;
+  final VoidCallback onArticleChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -12,12 +17,16 @@ class MoreOptionsDialog extends StatelessWidget {
         color: Colors.black45,
       ),
       color: AppColors.white,
-      onSelected: (int result) {
+      onSelected: (int result) async {
         if (result == 1) {
           print('수정하기 선택됨');
           // 여기에 수정 로직 추가
         } else if (result == 2) {
-          print('삭제하기 선택됨');
+          bool isSuccess = await PostService.deleteArticle(postId);
+          if (isSuccess) {
+            await alert(context, "삭제", "게시글 삭제에 성공하였습니다.");
+            onArticleChanged();
+          }
           // 여기에 삭제 로직 추가
         }
       },

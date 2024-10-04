@@ -40,6 +40,15 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
     });
   }
 
+  void reload() {
+    setState(() {
+      // 새로고침 로직
+      final postProvider = Provider.of<PostProvider>(context, listen: false);
+      postProvider.getInitialArticles(widget.event!.eventId);
+    });
+    _scrollController.jumpTo(0);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -79,16 +88,7 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
             ),
           );
           if (shouldRefresh == true) {
-            setState(() {
-              // 새로고침 로직
-              final postProvider =
-                  Provider.of<PostProvider>(context, listen: false);
-              postProvider.getInitialArticles(widget.event!.eventId);
-            });
-          }
-          if (shouldRefresh == true) {
-            postProvider.getInitialArticles(widget.event!.eventId);
-            _scrollController.jumpTo(0);
+            reload();
           }
         },
         backgroundColor: AppColors.brown,
@@ -128,6 +128,7 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
                     height: screenSize.width * 0.4,
                     onCommentPressed: () => _toggleComments(true),
                     article: postProvider.articles[index],
+                    onArticleChanged: reload,
                   );
                 },
               ),
