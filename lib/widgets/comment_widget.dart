@@ -11,10 +11,12 @@ class CommentWidget extends StatefulWidget {
     super.key,
     required this.comment,
     required this.onCommentChanged,
+    required this.onChangedCommentCnt,
   });
 
   final Comment comment;
   final VoidCallback onCommentChanged;
+  final VoidCallback onChangedCommentCnt;
 
   @override
   _CommentWidgetState createState() => _CommentWidgetState();
@@ -73,6 +75,8 @@ class _CommentWidgetState extends State<CommentWidget> {
               isAuthor(userProvider.login!.nickname)
                   ? CommentDialog(
                       comment: widget.comment,
+                      onCommentChanged: widget.onCommentChanged,
+                      onChangedCommentCnt: widget.onChangedCommentCnt,
                     )
                   : Container(),
             ],

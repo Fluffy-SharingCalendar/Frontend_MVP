@@ -9,10 +9,12 @@ class CommentDialog extends StatelessWidget {
     super.key,
     required this.comment,
     required this.onCommentChanged,
+    required this.onChangedCommentCnt,
   });
 
   final Comment comment;
   final VoidCallback onCommentChanged;
+  final VoidCallback onChangedCommentCnt;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class CommentDialog extends StatelessWidget {
           if (isSuccess) {
             await alert(context, "삭제", "게시글 삭제에 성공하였습니다.");
             onCommentChanged();
+            onChangedCommentCnt();
           }
           // 여기에 삭제 로직 추가
         }

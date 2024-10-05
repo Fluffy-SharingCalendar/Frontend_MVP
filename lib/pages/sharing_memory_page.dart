@@ -51,6 +51,17 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
     _scrollController.jumpTo(0);
   }
 
+  void uploadCommentCnt() async {
+    final double currentScrollPosition = _scrollController.position.pixels;
+
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
+    await postProvider.update(widget.event!.eventId);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(currentScrollPosition);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -151,6 +162,7 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
                 ? CommentSection(
                     onClosePressed: () => _toggleComments(false),
                     postId: selectedPostId!, // 선택된 postId 전달
+                    onChangedCommentCnt: uploadCommentCnt,
                   )
                 : Container(),
           ),
@@ -236,11 +248,13 @@ class ProfileSection extends StatelessWidget {
 class CommentSection extends StatefulWidget {
   final VoidCallback onClosePressed;
   final int postId;
+  final VoidCallback onChangedCommentCnt;
 
   const CommentSection({
     Key? key,
     required this.onClosePressed,
     required this.postId,
+    required this.onChangedCommentCnt,
   }) : super(key: key);
 
   @override
@@ -358,6 +372,7 @@ class _CommentSectionState extends State<CommentSection> {
                         widget.postId, _textEditingController.text);
 
                     if (isSuccess) {
+                      widget.onChangedCommentCnt();
                       _fetchComments();
                       _textEditingController.clear();
                     }
@@ -379,6 +394,7 @@ class _CommentSectionState extends State<CommentSection> {
                 return CommentWidget(
                   comment: commentProvider.comments[index],
                   onCommentChanged: _fetchComments,
+                  onChangedCommentCnt: widget.onChangedCommentCnt,
                 );
               },
             ),

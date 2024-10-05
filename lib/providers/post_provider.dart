@@ -13,10 +13,22 @@ class PostProvider with ChangeNotifier {
     });
   }
 
+  Future<void> update(int eventId) async {
+    _setLoading(true);
+    try {
+      int size = articles.length;
+      articles = [];
+      articles = await PostService.getArticles(eventId, 0, size);
+    } catch (e) {
+      throw Exception(e);
+    }
+    _setLoading(false);
+  }
+
   Future<void> getInitialArticles(int eventId) async {
     _setLoading(true);
     try {
-      articles = await PostService.getArticles(eventId, 0);
+      articles = await PostService.getArticles(eventId, 0, 10);
     } catch (e) {
       throw Exception(e);
     }
@@ -26,7 +38,7 @@ class PostProvider with ChangeNotifier {
   Future<void> getMoreArticles(int eventId, int page) async {
     _setLoading(true);
     try {
-      articles.addAll(await PostService.getArticles(eventId, page));
+      articles.addAll(await PostService.getArticles(eventId, page, 10));
     } catch (e) {
       throw Exception(e);
     }
