@@ -1,4 +1,7 @@
+import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:fluffy_mvp/models/comment_model.dart';
+import 'package:fluffy_mvp/services/comment_service.dart';
+import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:fluffy_mvp/widgets/comment_dialog.dart';
 import 'package:fluffy_mvp/widgets/gradation_profile_circle.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,8 @@ class CommentWidget extends StatefulWidget {
 
 class _CommentWidgetState extends State<CommentWidget> {
   List<String> profileImageList = ProfileImageList.profileImages;
+  TextEditingController _textEditingController = TextEditingController();
+  bool isEditMode = false;
 
   bool isAuthor(String myNickname) {
     return widget.comment.authorNickname == myNickname;
@@ -77,6 +82,14 @@ class _CommentWidgetState extends State<CommentWidget> {
                       comment: widget.comment,
                       onCommentChanged: widget.onCommentChanged,
                       onChangedCommentCnt: widget.onChangedCommentCnt,
+                      editMode: () {
+                        setState(() {
+                          isEditMode = true;
+                          _textEditingController = TextEditingController(
+                            text: widget.comment.content,
+                          );
+                        });
+                      },
                     )
                   : Container(),
             ],
@@ -85,12 +98,60 @@ class _CommentWidgetState extends State<CommentWidget> {
           const SizedBox(
             height: 10.0,
           ),
-          Text(
-            widget.comment.content,
-            style: const TextStyle(
-              fontSize: 12.0,
-            ),
-          ),
+          isEditMode
+              ? Column(
+                  children: [
+                    TextField(
+                      controller: _textEditingController,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                      ),
+                      style: const TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () async {
+                            bool isSuccess = await CommentService.modifyComment(
+                                widget.comment.commentId,
+                                _textEditingController.text);
+
+                            if (_textEditingController.text.isNotEmpty) {
+                              if (isSuccess) {
+                                await alert(context, "댓글 수정", "댓글을 수정하였습니다.");
+                                widget.onCommentChanged();
+                                setState(() {
+                                  isEditMode = false;
+                                });
+                              }
+                            } else {
+                              await alert(context, "수정 실패", "댓글을 입력해주세요.");
+                            }
+                          },
+                          child: const Text(
+                            "수정 완료👍",
+                            style: TextStyle(
+                              fontSize: 10.0,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.brown,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                )
+              : Text(
+                  widget.comment.content,
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                  ),
+                ),
         ],
       ),
     );

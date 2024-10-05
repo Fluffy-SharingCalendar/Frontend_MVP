@@ -91,10 +91,14 @@ class CommentService extends Auth {
       var response = await http.patch(Uri.parse(url),
           headers: {
             "Authorization": Auth.jwtToken ?? "Null",
+            'Content-Type': 'application/json;charset=UTF-8',
           },
           body: jsonEncode({
             "content": content,
           }));
+
+      print(response.statusCode);
+      print(utf8.decode(response.bodyBytes));
 
       if (response.statusCode == 204) {
         return true;

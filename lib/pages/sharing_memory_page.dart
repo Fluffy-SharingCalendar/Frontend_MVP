@@ -263,6 +263,7 @@ class CommentSection extends StatefulWidget {
 
 class _CommentSectionState extends State<CommentSection> {
   final TextEditingController _textEditingController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void didUpdateWidget(covariant CommentSection oldWidget) {
@@ -272,10 +273,10 @@ class _CommentSectionState extends State<CommentSection> {
     }
   }
 
-  void _fetchComments() {
+  void _fetchComments() async {
     final commentProvider =
         Provider.of<CommentProvider>(context, listen: false);
-    commentProvider.getComments(widget.postId);
+    await commentProvider.getComments(widget.postId);
   }
 
   @override
@@ -289,8 +290,6 @@ class _CommentSectionState extends State<CommentSection> {
   @override
   Widget build(BuildContext context) {
     final commentProvider = Provider.of<CommentProvider>(context);
-    print(widget.postId);
-
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 20.0,
@@ -375,6 +374,20 @@ class _CommentSectionState extends State<CommentSection> {
                       widget.onChangedCommentCnt();
                       _fetchComments();
                       _textEditingController.clear();
+
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (_scrollController.hasClients) {
+                          _scrollController.jumpTo(
+                              _scrollController.position.maxScrollExtent);
+
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            if (_scrollController.hasClients) {
+                              _scrollController.jumpTo(
+                                  _scrollController.position.maxScrollExtent);
+                            }
+                          });
+                        }
+                      });
                     }
                   } else {
                     alert(context, "작성 실패", "댓글을 입력해주세요.");
@@ -387,8 +400,12 @@ class _CommentSectionState extends State<CommentSection> {
               ),
             ],
           ),
+          const SizedBox(
+            height: 5.0,
+          ),
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: commentProvider.comments.length,
               itemBuilder: (context, index) {
                 return CommentWidget(

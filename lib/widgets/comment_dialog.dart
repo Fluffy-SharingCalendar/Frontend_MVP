@@ -10,11 +10,13 @@ class CommentDialog extends StatelessWidget {
     required this.comment,
     required this.onCommentChanged,
     required this.onChangedCommentCnt,
+    required this.editMode,
   });
 
   final Comment comment;
   final VoidCallback onCommentChanged;
   final VoidCallback onChangedCommentCnt;
+  final VoidCallback editMode;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class CommentDialog extends StatelessWidget {
       color: AppColors.white,
       onSelected: (int result) async {
         if (result == 1) {
-          onCommentChanged();
+          editMode();
         } else if (result == 2) {
           bool isSuccess =
               await CommentService.deleteComment(comment.commentId);
