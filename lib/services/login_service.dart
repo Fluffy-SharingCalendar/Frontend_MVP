@@ -5,6 +5,7 @@ import 'package:fluffy_mvp/models/login_model.dart';
 import 'package:http/http.dart' as http;
 
 class LoginService extends Auth {
+  // 로그인
   static Future<bool> login(Login login) async {
     const String url = "$domainUrl/login";
 
@@ -26,6 +27,7 @@ class LoginService extends Auth {
     }
   }
 
+  // 닉네임 중복 확인
   static Future<bool> checkNickname(String nickname) async {
     const String url = "$domainUrl/api/users/validation";
 
@@ -39,6 +41,9 @@ class LoginService extends Auth {
           'nickname': nickname,
         }),
       );
+
+      print(response.statusCode);
+      print(utf8.decode(response.bodyBytes));
 
       if (response.statusCode == 200) {
         return true;

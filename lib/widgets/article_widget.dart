@@ -25,19 +25,19 @@ class ArticleWidget extends StatefulWidget {
 }
 
 class _ArticleWidgetState extends State<ArticleWidget> {
-  List<String> profileImageList = ProfileImageList.profileImages;
-  int currentIndex = 0;
+  int commentCount = 0;
 
-  void _goToNextImage() {
-    setState(() {
-      currentIndex = (currentIndex + 1) % widget.article.urls.length;
-    });
+  @override
+  void initState() {
+    super.initState();
+    // 초기값으로 article에 저장된 댓글 수를 설정
+    commentCount = widget.article.commentCnt;
   }
 
-  void _goToPreviousImage() {
+  // 댓글 수를 업데이트하는 함수
+  void _updateCommentCount(int newCount) {
     setState(() {
-      currentIndex = (currentIndex - 1 + widget.article.urls.length) %
-          widget.article.urls.length;
+      commentCount = newCount;
     });
   }
 
@@ -60,10 +60,10 @@ class _ArticleWidgetState extends State<ArticleWidget> {
           widget.article.urls.isNotEmpty
               ? ArticleWidgetImageSlider(
                   height: widget.height,
-                  currentIndex: currentIndex,
+                  currentIndex: 0,
                   imageList: widget.article.urls,
-                  goToNextImage: _goToNextImage,
-                  goToPreviousImage: _goToPreviousImage,
+                  goToNextImage: () {},
+                  goToPreviousImage: () {},
                 )
               : Container(),
 
@@ -83,8 +83,8 @@ class _ArticleWidgetState extends State<ArticleWidget> {
           // 댓글 및 좋아요 상호작용 버튼 위젯
           ArticleWidgetInteractions(
             onCommentPressed: () =>
-                widget.onCommentPressed(widget.article.postId), // postId 전달
-            commentCount: widget.article.commentCnt,
+                widget.onCommentPressed(widget.article.postId),
+            commentCount: commentCount, // 현재 댓글 수 표시
           ),
 
           Container(
@@ -155,7 +155,7 @@ class AuthorInfo extends StatelessWidget {
             ],
           ),
           isAuthor(userProvider.login!.nickname)
-              ? MoreOptionsDialog(
+              ? ArticleDialog(
                   article: article,
                   onArticleChanged: onArticleChanged,
                 )

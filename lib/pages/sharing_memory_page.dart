@@ -3,6 +3,8 @@ import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:fluffy_mvp/pages/post_article_page.dart';
 import 'package:fluffy_mvp/providers/comment_provider.dart';
 import 'package:fluffy_mvp/providers/post_provider.dart';
+import 'package:fluffy_mvp/services/comment_service.dart';
+import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:fluffy_mvp/widgets/comment_widget.dart';
 import 'package:fluffy_mvp/widgets/gradation_profile_triangle.dart';
 import 'package:flutter/material.dart';
@@ -249,6 +251,20 @@ class _CommentSectionState extends State<CommentSection> {
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
+  void didUpdateWidget(covariant CommentSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.postId != widget.postId) {
+      _fetchComments();
+    }
+  }
+
+  void _fetchComments() {
+    final commentProvider =
+        Provider.of<CommentProvider>(context, listen: false);
+    commentProvider.getComments(widget.postId);
+  }
+
+  @override
   void initState() {
     super.initState();
     final commentProvider =
@@ -259,6 +275,7 @@ class _CommentSectionState extends State<CommentSection> {
   @override
   Widget build(BuildContext context) {
     final commentProvider = Provider.of<CommentProvider>(context);
+    print(widget.postId);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -310,25 +327,50 @@ class _CommentSectionState extends State<CommentSection> {
           const SizedBox(
             height: 10.0,
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: TextField(
-              style: const TextStyle(
-                fontSize: 12.0,
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: TextField(
+                    style: const TextStyle(
+                      fontSize: 12.0,
+                    ),
+                    controller: _textEditingController,
+                    decoration: const InputDecoration(
+                      hintText: "댓글을 입력해주세요.",
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
               ),
-              controller: _textEditingController,
-              decoration: const InputDecoration(
-                hintText: "댓글을 입력해주세요.",
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
+              IconButton(
+                onPressed: () async {
+                  if (_textEditingController.text.isNotEmpty) {
+                    bool isSuccess = await CommentService.postComment(
+                        widget.postId, _textEditingController.text);
+
+                    if (isSuccess) {
+                      _fetchComments();
+                      _textEditingController.clear();
+                    }
+                  } else {
+                    alert(context, "작성 실패", "댓글을 입력해주세요.");
+                  }
+                },
+                icon: const Icon(
+                  Icons.send,
+                  color: Colors.black45,
+                ),
               ),
-            ),
+            ],
           ),
           Expanded(
             child: ListView.builder(
@@ -336,6 +378,7 @@ class _CommentSectionState extends State<CommentSection> {
               itemBuilder: (context, index) {
                 return CommentWidget(
                   comment: commentProvider.comments[index],
+                  onCommentChanged: _fetchComments,
                 );
               },
             ),

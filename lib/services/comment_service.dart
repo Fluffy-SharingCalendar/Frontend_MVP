@@ -32,4 +32,77 @@ class CommentService extends Auth {
       throw Exception(e);
     }
   }
+
+  static Future<bool> postComment(int postId, String content) async {
+    final String url = "$domainUrl/api/comments/$postId";
+    print(url);
+
+    try {
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {
+          "Authorization": Auth.jwtToken ?? "Null",
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        body: jsonEncode({
+          'content': content,
+        }),
+      );
+
+      if (response.statusCode == 204) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  // 댓글 삭제
+  static Future<bool> deleteComment(int commentId) async {
+    final String url = "$domainUrl/api/comments/$commentId";
+    print(url);
+
+    try {
+      var response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          "Authorization": Auth.jwtToken ?? "Null",
+        },
+      );
+
+      if (response.statusCode == 204) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  // 게시글 수정
+  static Future<bool> modifyComment(int commentId, String content) async {
+    final String url = "$domainUrl/api/comments/$commentId";
+    print(url);
+
+    try {
+      var response = await http.patch(Uri.parse(url),
+          headers: {
+            "Authorization": Auth.jwtToken ?? "Null",
+          },
+          body: jsonEncode({
+            "content": content,
+          }));
+
+      if (response.statusCode == 204) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 }

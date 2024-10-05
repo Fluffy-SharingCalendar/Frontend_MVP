@@ -121,6 +121,9 @@ class PostService extends Auth {
         },
       );
 
+      print(response.statusCode);
+      print(utf8.decode(response.bodyBytes));
+
       if (response.statusCode == 204) {
         return true;
       } else {
