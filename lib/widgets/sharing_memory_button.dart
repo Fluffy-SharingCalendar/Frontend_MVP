@@ -6,10 +6,12 @@ class SharingMemoryButton extends StatefulWidget {
   const SharingMemoryButton({
     super.key,
     required this.event,
+    required this.iamgeUrl,
     required this.selectedDay,
   });
 
   final Event event;
+  final String iamgeUrl;
   final String selectedDay;
 
   @override
@@ -35,7 +37,11 @@ class _SharingMemoryButtonState extends State<SharingMemoryButton> {
         width: 150,
         padding: const EdgeInsets.all(15.0),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(96, 96, 125, 139),
+          color: Colors.white,
+          image: DecorationImage(
+            image: NetworkImage(widget.iamgeUrl),
+            fit: BoxFit.cover,
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),

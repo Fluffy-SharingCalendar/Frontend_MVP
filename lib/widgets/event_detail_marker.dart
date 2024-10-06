@@ -1,3 +1,4 @@
+import 'package:fluffy_mvp/models/color_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/models/event_model.dart';
 import 'package:fluffy_mvp/services/color_service.dart';
@@ -15,12 +16,23 @@ class EventDetailMarker extends StatefulWidget {
 }
 
 class _EventDetailMarkerState extends State<EventDetailMarker> {
-  late Color eventMarkerColor;
+  Color eventMarkerColor = AppColors.pink;
 
   @override
   void initState() {
     super.initState();
     eventMarkerColor = hexToColor(widget.event.color);
+  }
+
+  @override
+  void didUpdateWidget(covariant EventDetailMarker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.event.color != widget.event.color) {
+      setState(() {
+        eventMarkerColor = hexToColor(widget.event.color);
+      });
+    }
   }
 
   @override

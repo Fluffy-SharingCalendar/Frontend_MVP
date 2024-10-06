@@ -34,6 +34,7 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
   int page = 0;
   int? selectedPostId; // 현재 댓글을 열고 있는 postId
   bool isCommentPressed = false;
+  bool isLoading = false;
 
   // 댓글 창 열기/닫기
   void _toggleComments(bool isOpened, [int? postId]) {
@@ -43,12 +44,19 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
     });
   }
 
-  void reload() {
+  void reload() async {
     setState(() {
-      final postProvider = Provider.of<PostProvider>(context, listen: false);
-      postProvider.getInitialArticles(widget.event!.eventId);
+      isLoading = true;
     });
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
+    await postProvider.update(widget.event!.eventId);
+
     _scrollController.jumpTo(0);
+
+    setState(() {
+      page = 0;
+      isLoading = false;
+    });
   }
 
   void uploadCommentCnt() async {
@@ -60,13 +68,23 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(currentScrollPosition);
     });
+
+    setState(() {
+      page = 0;
+    });
   }
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      isLoading = true;
+    });
     final postProvider = Provider.of<PostProvider>(context, listen: false);
     postProvider.getInitialArticles(widget.event!.eventId);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -122,31 +140,38 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
           ),
           // 글 섹션
           Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                if (!postProvider.loading &&
-                    scrollInfo.metrics.pixels ==
-                        scrollInfo.metrics.maxScrollExtent) {
-                  page++;
-                  postProvider.getMoreArticles(widget.event!.eventId, page);
-                  return true;
-                }
-                return false;
-              },
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: postProvider.articles.length,
-                itemBuilder: (context, index) {
-                  return ArticleWidget(
-                    height: screenSize.width * 0.4,
-                    onCommentPressed: (postId) =>
-                        _toggleComments(true, postId), // postId 전달
-                    article: postProvider.articles[index],
-                    onArticleChanged: reload,
-                  );
-                },
-              ),
-            ),
+            child: isLoading // 로딩 중일 때는 로딩 인디케이터 표시
+                ? const Center(
+                    child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.brown),
+                    backgroundColor: AppColors.pink,
+                  ))
+                : NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      if (!postProvider.loading &&
+                          scrollInfo.metrics.pixels ==
+                              scrollInfo.metrics.maxScrollExtent) {
+                        page++;
+                        postProvider.getMoreArticles(
+                            widget.event!.eventId, page);
+                        return true;
+                      }
+                      return false;
+                    },
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: postProvider.articles.length,
+                      itemBuilder: (context, index) {
+                        return ArticleWidget(
+                          height: screenSize.width * 0.4,
+                          onCommentPressed: (postId) =>
+                              _toggleComments(true, postId), // postId 전달
+                          article: postProvider.articles[index],
+                          onArticleChanged: reload,
+                        );
+                      },
+                    ),
+                  ),
           ),
           // 댓글 섹션
           Container(
@@ -270,6 +295,7 @@ class _CommentSectionState extends State<CommentSection> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.postId != widget.postId) {
       _fetchComments();
+      _scrollController.jumpTo(0);
     }
   }
 
