@@ -23,6 +23,7 @@ class EventDetailView extends StatefulWidget {
 
 class _EventDetailViewState extends State<EventDetailView> {
   late EventDetail eventDetail;
+  String randomurl = "";
 
   String formatDate(DateTime date) {
     final DateFormat formatter = DateFormat('yyyy.MM.dd');
@@ -35,12 +36,14 @@ class _EventDetailViewState extends State<EventDetailView> {
 
     setState(() {
       eventDetail = futureEvent;
+      randomurl = eventDetail.randomImageUrl;
     });
   }
 
   @override
   void initState() {
     super.initState();
+    _getEventDetailView();
   }
 
   @override
@@ -141,6 +144,7 @@ class _EventDetailViewState extends State<EventDetailView> {
         SharingMemoryButton(
           event: widget.event,
           selectedDay: formatDate(widget.selectedDay),
+          iamgeUrl: randomurl,
         ),
       ],
     );

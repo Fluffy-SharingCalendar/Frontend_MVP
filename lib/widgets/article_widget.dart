@@ -16,7 +16,7 @@ class ArticleWidget extends StatefulWidget {
   });
 
   final double height;
-  final VoidCallback onCommentPressed;
+  final Function(int) onCommentPressed;
   final Article article;
   final VoidCallback onArticleChanged;
 
@@ -82,7 +82,8 @@ class _ArticleWidgetState extends State<ArticleWidget> {
 
           // 댓글 및 좋아요 상호작용 버튼 위젯
           ArticleWidgetInteractions(
-            onCommentPressed: widget.onCommentPressed,
+            onCommentPressed: () =>
+                widget.onCommentPressed(widget.article.postId),
             commentCount: widget.article.commentCnt,
           ),
 
@@ -154,7 +155,7 @@ class AuthorInfo extends StatelessWidget {
             ],
           ),
           isAuthor(userProvider.login!.nickname)
-              ? MoreOptionsDialog(
+              ? ArticleDialog(
                   article: article,
                   onArticleChanged: onArticleChanged,
                 )

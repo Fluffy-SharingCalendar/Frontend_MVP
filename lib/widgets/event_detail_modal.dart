@@ -22,7 +22,6 @@ class EventDetailModal extends StatefulWidget {
 }
 
 class _EventDetailModalState extends State<EventDetailModal> {
-  Color eventMarkerColor = const Color.fromARGB(255, 131, 117, 255);
   bool isClickedDetail = false;
   Event? selectedEvent;
 
@@ -34,13 +33,22 @@ class _EventDetailModalState extends State<EventDetailModal> {
   }
 
   @override
+  void didUpdateWidget(covariant EventDetailModal oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.selectedDay != widget.selectedDay) {
+      toggleClicked(false, null);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Material(
       elevation: 5.0,
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(18.0),
-        child: isClickedDetail && selectedEvent != null
+        child: isClickedDetail
             ? EventDetailView(
                 selectedDay: widget.selectedDay,
                 event: selectedEvent!,

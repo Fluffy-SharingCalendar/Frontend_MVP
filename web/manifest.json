@@ -1,6 +1,6 @@
 {
-    "name": "fluffy_mvp",
-    "short_name": "fluffy_mvp",
+    "name": "추억을 공유하는 Fluffy",
+    "short_name": "추억을 공유하는 Fluffy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

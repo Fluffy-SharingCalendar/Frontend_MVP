@@ -70,8 +70,6 @@ class PostService extends Auth {
     try {
       var response = await request.send();
 
-      String responseBody = await response.stream.bytesToString();
-
       if (response.statusCode == 204) {
         return true;
       } else {
@@ -84,8 +82,9 @@ class PostService extends Auth {
   }
 
   // 게시글 전체 조회
-  static Future<List<Article>> getArticles(int eventId, int page) async {
-    final String url = "$domainUrl/api/posts/$eventId?page=$page";
+  static Future<List<Article>> getArticles(
+      int eventId, int page, int size) async {
+    final String url = "$domainUrl/api/posts/$eventId?page=$page&size=$size";
     print(page);
 
     try {
@@ -120,6 +119,9 @@ class PostService extends Auth {
           "Authorization": Auth.jwtToken ?? "Null",
         },
       );
+
+      print(response.statusCode);
+      print(utf8.decode(response.bodyBytes));
 
       if (response.statusCode == 204) {
         return true;
