@@ -30,62 +30,69 @@ class _EventMarkerState extends State<EventMarker> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(3.0),
-      decoration: BoxDecoration(
-        color: eventMarkerColor.withOpacity(0.3),
-        borderRadius: BorderRadius.horizontal(
-          left: widget.isFirst ? const Radius.circular(5.0) : Radius.zero,
-          right: widget.isLast ? const Radius.circular(5.0) : Radius.zero,
+        height: 25.0,
+        padding: const EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          color: eventMarkerColor.withOpacity(0.3),
+          borderRadius: BorderRadius.horizontal(
+            left: widget.isFirst ? const Radius.circular(5.0) : Radius.zero,
+            right: widget.isLast ? const Radius.circular(5.0) : Radius.zero,
+          ),
+          border: Border(
+            left: widget.isFirst
+                ? BorderSide(color: eventMarkerColor)
+                : BorderSide.none,
+            right: widget.isLast
+                ? BorderSide(color: eventMarkerColor)
+                : BorderSide.none,
+            top: BorderSide(color: eventMarkerColor),
+            bottom: BorderSide(color: eventMarkerColor),
+          ),
         ),
-        border: Border(
-          left: widget.isFirst
-              ? BorderSide(color: eventMarkerColor)
-              : BorderSide.none,
-          right: widget.isLast
-              ? BorderSide(color: eventMarkerColor)
-              : BorderSide.none,
-          top: BorderSide(color: eventMarkerColor),
-          bottom: BorderSide(color: eventMarkerColor),
-        ),
-      ),
-      child: widget.isFirst
-          ? Row(
-              children: [
-                Icon(
-                  Icons.event,
-                  color: eventMarkerColor,
-                  size: 13.0,
-                ),
-                const SizedBox(width: 5.0),
-                Expanded(
-                  child: Text(
-                    widget.event.title,
-                    style: const TextStyle(
-                      fontSize: 10.0,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
+        child: widget.isFirst
+            ? Row(
+                children: [
+                  Icon(
+                    Icons.event,
+                    color: eventMarkerColor,
+                    size: 13.0,
+                  ),
+                  const SizedBox(width: 5.0),
+                  Expanded(
+                    child: Text(
+                      widget.event.title,
+                      style: const TextStyle(
+                        fontSize: 10.0,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      softWrap: false,
+                      overflow: TextOverflow.visible,
                     ),
-                    softWrap: false,
-                    overflow: TextOverflow.visible,
                   ),
-                ),
-              ],
-            )
-          : const Row(
-              children: [
-                Icon(
-                  Icons.event,
-                  color: Color.fromARGB(0, 255, 255, 255),
-                  size: 13.0,
-                ),
-                Text(
-                  "",
-                  style: TextStyle(
-                    fontSize: 10.0,
+                ],
+              )
+            : Row(
+                children: [
+                  const Icon(
+                    Icons.event,
+                    color: Color.fromARGB(0, 0, 0, 0),
+                    size: 13.0,
                   ),
-                ),
-              ],
-            ),
-    );
+                  const SizedBox(width: 5.0),
+                  Expanded(
+                    child: Text(
+                      widget.event.title,
+                      style: const TextStyle(
+                        fontSize: 10.0,
+                        color: Color.fromARGB(0, 0, 0, 0),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      softWrap: false,
+                      overflow: TextOverflow.visible,
+                    ),
+                  ),
+                ],
+              ));
   }
 }
