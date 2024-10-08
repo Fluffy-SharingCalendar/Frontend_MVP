@@ -6,6 +6,8 @@ import 'package:fluffy_mvp/widgets/alert.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:convert';
+import 'package:fluffy_mvp/providers/post_provider.dart';
+import 'package:provider/provider.dart';
 
 class PostArticlePage extends StatefulWidget {
   const PostArticlePage({
@@ -46,6 +48,7 @@ class _PostArticlePageState extends State<PostArticlePage> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
+    final postProvider = Provider.of<PostProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -102,9 +105,11 @@ class _PostArticlePageState extends State<PostArticlePage> {
                           .toList(),
                     );
 
-                    bool isSuccess = await PostService.postArticle(posting);
+                    int newArticleindex =
+                        await PostService.postArticle(posting);
+                    postProvider.setIndex(newArticleindex);
 
-                    if (isSuccess) {
+                    if (newArticleindex != -1) {
                       Navigator.pop(context, true);
                     }
                   }),

@@ -13,12 +13,14 @@ class ArticleWidget extends StatefulWidget {
     required this.onCommentPressed,
     required this.article,
     required this.onArticleChanged,
+    required this.index,
   });
 
   final double height;
   final Function(int) onCommentPressed;
   final Article article;
   final VoidCallback onArticleChanged;
+  final int index;
 
   @override
   _ArticleWidgetState createState() => _ArticleWidgetState();

@@ -5,8 +5,16 @@ import 'package:flutter/material.dart';
 class PostProvider with ChangeNotifier {
   List<Article> articles = [];
   bool loading = false;
+  int newArticleIndex = -1;
 
-  void _setLoading(bool value) {
+  void setIndex(int index) {
+    setLoading(true);
+    newArticleIndex = index;
+    print("provider new : $newArticleIndex");
+    setLoading(false);
+  }
+
+  void setLoading(bool value) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loading = value;
       notifyListeners();
@@ -14,7 +22,7 @@ class PostProvider with ChangeNotifier {
   }
 
   Future<void> update(int eventId) async {
-    _setLoading(true);
+    setLoading(true);
     try {
       int size = articles.length;
       articles = [];
@@ -22,26 +30,41 @@ class PostProvider with ChangeNotifier {
     } catch (e) {
       throw Exception(e);
     }
-    _setLoading(false);
+    setLoading(false);
+  }
+
+  Future<void> updateAfterPosting(int eventId) async {
+    setLoading(true);
+    try {
+      if (newArticleIndex != -1) {
+        int size = newArticleIndex + 1;
+        articles = [];
+        articles = await PostService.getArticles(eventId, 0, size);
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+    setLoading(false);
   }
 
   Future<void> getInitialArticles(int eventId) async {
-    _setLoading(true);
+    setLoading(true);
     try {
+      articles = [];
       articles = await PostService.getArticles(eventId, 0, 10);
     } catch (e) {
       throw Exception(e);
     }
-    _setLoading(false);
+    setLoading(false);
   }
 
   Future<void> getMoreArticles(int eventId, int page) async {
-    _setLoading(true);
+    setLoading(true);
     try {
       articles.addAll(await PostService.getArticles(eventId, page, 10));
     } catch (e) {
       throw Exception(e);
     }
-    _setLoading(false);
+    setLoading(false);
   }
 }

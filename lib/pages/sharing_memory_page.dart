@@ -10,8 +10,10 @@ import 'package:fluffy_mvp/widgets/gradation_profile_triangle.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffy_mvp/widgets/article_widget.dart';
 import 'package:fluffy_mvp/models/profile_image_list.dart';
+import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:fluffy_mvp/providers/user_provider.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class SharingMemoryPage extends StatefulWidget {
   const SharingMemoryPage({
@@ -28,40 +30,47 @@ class SharingMemoryPage extends StatefulWidget {
 }
 
 class _SharingMemoryPageState extends State<SharingMemoryPage> {
-  final ScrollController _scrollController = ScrollController(
+  // 기존 ScrollController 대신 AutoScrollController 사용
+  final AutoScrollController _scrollController = AutoScrollController(
     keepScrollOffset: true,
   );
   int page = 0;
-  int? selectedPostId; // 현재 댓글을 열고 있는 postId
+  int? selectedPostId;
   bool isCommentPressed = false;
   bool isLoading = false;
 
-  // 댓글 창 열기/닫기
   void _toggleComments(bool isOpened, [int? postId]) {
     setState(() {
       isCommentPressed = isOpened;
-      selectedPostId = postId; // 선택된 postId를 저장
+      selectedPostId = postId;
+    });
+  }
+
+  void scrollToItem(int index) async {
+    await _scrollController.scrollToIndex(
+      index,
+      preferPosition: AutoScrollPosition.begin,
+      duration: const Duration(milliseconds: 1),
+    );
+    _scrollController.highlight(index);
+
+    setState(() {
+      isLoading = false;
     });
   }
 
   void reload() async {
-    setState(() {
-      isLoading = true;
-    });
     final postProvider = Provider.of<PostProvider>(context, listen: false);
     await postProvider.update(widget.event!.eventId);
-
     _scrollController.jumpTo(0);
 
     setState(() {
       page = 0;
-      isLoading = false;
     });
   }
 
   void uploadCommentCnt() async {
     final double currentScrollPosition = _scrollController.position.pixels;
-
     final postProvider = Provider.of<PostProvider>(context, listen: false);
     await postProvider.update(widget.event!.eventId);
 
@@ -97,6 +106,7 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
   Widget build(BuildContext context) {
     final postProvider = Provider.of<PostProvider>(context);
     final Size screenSize = MediaQuery.of(context).size;
+    Timer? debounce;
 
     return Scaffold(
       appBar: AppBar(
@@ -119,7 +129,13 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
             ),
           );
           if (shouldRefresh == true) {
-            reload();
+            setState(() {
+              isLoading = true;
+            });
+            await postProvider.updateAfterPosting(widget.event!.eventId);
+            if (postProvider.newArticleIndex != -1) {
+              scrollToItem(postProvider.newArticleIndex);
+            }
           }
         },
         backgroundColor: AppColors.brown,
@@ -140,39 +156,68 @@ class _SharingMemoryPageState extends State<SharingMemoryPage> {
           ),
           // 글 섹션
           Expanded(
-            child: isLoading // 로딩 중일 때는 로딩 인디케이터 표시
-                ? const Center(
-                    child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.brown),
-                    backgroundColor: AppColors.pink,
-                  ))
-                : NotificationListener<ScrollNotification>(
+            child: Stack(
+              children: [
+                Opacity(
+                  opacity: isLoading ? 0.0 : 1.0,
+                  child: NotificationListener<ScrollNotification>(
                     onNotification: (ScrollNotification scrollInfo) {
-                      if (!postProvider.loading &&
-                          scrollInfo.metrics.pixels ==
-                              scrollInfo.metrics.maxScrollExtent) {
-                        page++;
-                        postProvider.getMoreArticles(
-                            widget.event!.eventId, page);
+                      if (scrollInfo.metrics.pixels ==
+                          scrollInfo.metrics.maxScrollExtent) {
+                        if (debounce?.isActive ?? false) return false;
+                        if (!postProvider.loading) {
+                          debounce = Timer(const Duration(milliseconds: 500),
+                              () async {
+                            postProvider.setLoading(true);
+                            page++;
+                            try {
+                              await postProvider.getMoreArticles(
+                                  widget.event!.eventId, page);
+                            } catch (error) {
+                              print("Error: $error");
+                            } finally {
+                              postProvider.setLoading(false);
+                            }
+                          });
+                        }
                         return true;
                       }
                       return false;
                     },
                     child: ListView.builder(
                       controller: _scrollController,
+                      padding: EdgeInsets.zero,
                       itemCount: postProvider.articles.length,
                       itemBuilder: (context, index) {
-                        return ArticleWidget(
-                          height: screenSize.width * 0.4,
-                          onCommentPressed: (postId) =>
-                              _toggleComments(true, postId), // postId 전달
-                          article: postProvider.articles[index],
-                          onArticleChanged: reload,
+                        return AutoScrollTag(
+                          key: ValueKey(index),
+                          controller: _scrollController,
+                          index: index,
+                          child: ArticleWidget(
+                            height: screenSize.width * 0.4,
+                            onCommentPressed: (postId) =>
+                                _toggleComments(true, postId),
+                            article: postProvider.articles[index],
+                            onArticleChanged: reload,
+                            index: index,
+                          ),
                         );
                       },
                     ),
                   ),
+                ),
+                if (isLoading)
+                  const Center(
+                    child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.brown),
+                      backgroundColor: AppColors.pink,
+                    ),
+                  ),
+              ],
+            ),
           ),
+
           // 댓글 섹션
           Container(
             padding: const EdgeInsets.only(

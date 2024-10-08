@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 class PostService extends Auth {
   // 게시글 등록
-  static Future<bool> postArticle(Posting posting) async {
+  static Future<int> postArticle(Posting posting) async {
     final String url = "$domainUrl/api/posts/${posting.eventId}";
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
@@ -69,11 +69,15 @@ class PostService extends Auth {
     }
     try {
       var response = await request.send();
+      print(response.statusCode);
 
-      if (response.statusCode == 204) {
-        return true;
+      if (response.statusCode == 200) {
+        var responseBody = await response.stream.toBytes();
+        int newArticeIndex = int.parse(utf8.decode(responseBody));
+
+        return newArticeIndex;
       } else {
-        return false;
+        return -1;
       }
     } catch (e) {
       print("error : $e");
@@ -85,7 +89,7 @@ class PostService extends Auth {
   static Future<List<Article>> getArticles(
       int eventId, int page, int size) async {
     final String url = "$domainUrl/api/posts/$eventId?page=$page&size=$size";
-    print(page);
+    print(url);
 
     try {
       var response = await http.get(

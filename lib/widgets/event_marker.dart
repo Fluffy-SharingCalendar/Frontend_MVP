@@ -73,6 +73,11 @@ class _EventMarkerState extends State<EventMarker> {
             )
           : const Row(
               children: [
+                Icon(
+                  Icons.event,
+                  color: Color.fromARGB(0, 255, 255, 255),
+                  size: 13.0,
+                ),
                 Text(
                   "",
                   style: TextStyle(
